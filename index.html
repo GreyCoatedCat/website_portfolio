@@ -13,7 +13,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wdth,wght@62..125,400..700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wght@400..700&amp;display=swap" rel="stylesheet">
 <style>
 :root {
   /* Layout: fly into a lit corridor of squares, read square tiles in the dark, end at a small city inside a cube.
@@ -180,6 +180,13 @@ a { color: inherit; }
   background: var(--void); color: var(--text);
 }
 .corridor { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* darkens the top and bottom so the header and the name stay readable; a static layer, so it costs nothing per frame */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .85), rgba(0, 0, 0, .6) 7.5%, transparent 17%, transparent 50%, rgba(0, 0, 0, .45) 75%, rgba(0, 0, 0, .8));
+  transition: opacity .4s;
+}
+.hud-off .hero::after { opacity: 0; }
 .hero-name {
   /* one line, centred under the corridor and fitted to the full width (see fitName) */
   position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(84px, 12vh, 124px);
@@ -187,7 +194,7 @@ a { color: inherit; }
   font-family: var(--display); font-weight: 700; text-transform: uppercase;
   font-size: clamp(2.5rem, 7vw, 9rem); line-height: .92; letter-spacing: -.04em;
   color: var(--text); text-shadow: 0 2px 30px rgba(0, 0, 0, .5);
-  transform-origin: 50% 100%;
+  transform-origin: 50% 100%; will-change: transform, opacity; z-index: 2;
 }
 .scroll-cue {
   position: absolute; left: 50%; bottom: clamp(18px, 3.5vh, 32px); z-index: 2; transform: translateX(-50%);
@@ -244,14 +251,17 @@ a { color: inherit; }
 .cine-bars i:first-child { top: 0; transform-origin: 50% 0; }
 .cine-bars i:last-child { bottom: 0; transform-origin: 50% 100%; }
 .bars-out .cine-bars i { transform: scaleY(0); }
+.intro-fast .cine-bars i { transition-duration: .45s; }
 .intro-pre .hero-fit .ch { opacity: 0; transform: translateY(.38em) scale(1.08); filter: blur(14px); }
 .intro-pre.name-in .hero-fit .ch {
   opacity: 1; transform: none; filter: blur(0);
   transition: opacity 1.6s cubic-bezier(.22, 1, .36, 1) var(--d), transform 2.4s cubic-bezier(.22, 1, .36, 1) var(--d), filter 1.9s cubic-bezier(.22, 1, .36, 1) var(--d);
 }
+@media (hover: none), (pointer: coarse) { .intro-pre .hero-fit .ch { filter: none; } }
 .intro-pre .site-head, .intro-pre .scroll-cue { opacity: 0; pointer-events: none; }
 .intro-pre.ui-in .site-head, .intro-pre.ui-in .scroll-cue { opacity: 1; pointer-events: auto; transition: opacity 1.4s ease; }
 .intro-pre.ui-in .site-head { pointer-events: none; }
+.intro-pre.intro-fast .site-head, .intro-pre.intro-fast .scroll-cue { transition-duration: .4s; }
 
 /* Loading screen: eight blocks that come apart and lock back into a cube */
 .loader { display: none; }
@@ -307,6 +317,27 @@ a { color: inherit; }
   margin: 0 0 18px;
   font-family: var(--display); font-weight: 600; letter-spacing: -.01em; font-size: 1.65rem; line-height: 1.1;
 }
+
+/* Background: a faint field of isometric cubes (the tumbling-blocks illusion) behind every section under the
+   cover, fullest at the sides and thinner behind the text, with a few cubes slowly lighting up. It drifts a
+   little slower than the page, so it reads as a layer further back. */
+.section { position: relative; }
+.section > .wrap { position: relative; }
+.section { --veil: rgba(10, 13, 18, .75); }
+.section.alt { --veil: rgba(16, 21, 28, .75); }
+.section.contact { --veil: rgba(5, 7, 10, .75); }
+.bg-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+/* thinner behind the text: a veil in the section's own colour over the middle (cheaper than a mask) */
+.bg-field::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--veil) 26%, var(--veil) 74%, transparent); }
+.bg-field-in {
+  position: absolute; left: 0; right: 0; top: -260px; bottom: -260px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath fill='%23E9E4D8' fill-opacity='.03' d='M0 -30L26 -15L0 0L-26 -15ZM52 -30L78 -15L52 0L26 -15ZM26 15L52 30L26 45L0 30ZM0 60L26 75L0 90L-26 75ZM52 60L78 75L52 90L26 75Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.016' d='M-26 -15L0 0L0 30L-26 15ZM26 -15L52 0L52 30L26 15ZM0 30L26 45L26 75L0 60ZM-26 75L0 90L0 120L-26 105ZM26 75L52 90L52 120L26 105Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.006' d='M0 0L26 -15L26 15L0 30ZM52 0L78 -15L78 15L52 30ZM26 45L52 30L52 60L26 75ZM0 90L26 75L26 105L0 120ZM52 90L78 75L78 105L52 120Z'/%3E%3C/svg%3E") 0 0 / 52px 90px;
+}
+.has-drift .bg-field-in { will-change: transform; }
+.bg-lit { position: absolute; width: 52px; height: 60px; color: var(--accent); opacity: .3; }
+.has-drift .bg-lit { animation: bg-lit 9s ease-in-out infinite; }
+.bg-lit svg { display: block; fill: currentColor; }
+@keyframes bg-lit { 0%, 100% { opacity: .15; } 50% { opacity: .55; } }
 
 /* Experience: a column of blocks, newest on top, joined by a rail; a role still held has a lit block */
 .xp { --xp-gap: clamp(44px, 5.5vw, 72px); list-style: none; margin: 0; padding: 0; }
@@ -409,6 +440,22 @@ a { color: inherit; }
 .facts dt, .facts dd { padding: 14px 0; border-bottom: 1px solid var(--line-strong); }
 .facts dt { color: var(--muted); font-family: var(--label); font-size: .92rem; padding-right: 36px; }
 .facts dd { margin: 0; }
+/* quick links under About: small extruded blocks that lift when hovered */
+.social { list-style: none; margin: 32px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px 16px; }
+.soc {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px 0 14px;
+  background: var(--bg); color: var(--text); text-decoration: none;
+  border: 1.5px solid var(--line-strong);
+  font: 600 .92rem/1 var(--label);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547;
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s cubic-bezier(.2, .8, .2, 1), border-color .25s;
+}
+.soc::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--accent); }
+.soc:hover {
+  transform: translate(-2px, -2px); border-color: var(--text);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547, 5px 5px 0 #212F3E, 6px 6px 0 #1D2A38;
+}
+.soc:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053; }
 .cube-wrap { display: grid; justify-items: center; gap: 28px; }
 .cube-scene {
   --s: clamp(200px, 25vw, 310px);
@@ -476,12 +523,12 @@ a { color: inherit; }
 .cred-list li.has-badge { grid-template-columns: 92px minmax(0, 1fr) auto; padding: 22px 0 26px; }
 .cred-badge {
   position: relative; width: 64px; height: 64px; margin: 4px 0 0 2px;
-  background: var(--bg) radial-gradient(circle, transparent 9px, var(--accent) 9px, var(--accent) 13px, transparent 13px, transparent 18px, var(--line-strong) 18px, var(--line-strong) 19.5px, transparent 19.5px);
+  display: grid; place-items: center;
+  background: var(--bg);
   border: 1.5px solid var(--line-strong);
   box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2F4256, 3px 3px 0 #2D4053, 4px 4px 0 #2B3D50, 5px 5px 0 #293A4D, 6px 6px 0 #27384A, 7px 7px 0 #253547, 8px 8px 0 #233344, 9px 9px 0 rgba(233, 228, 216, .22);
 }
-.cred-badge.is-comp { background: var(--bg) repeating-conic-gradient(var(--accent) 0 25%, transparent 0 50%) 0 0 / 16px 16px content-box; padding: 14.5px; }
-.cred-badge img { position: absolute; inset: 0; z-index: 1; display: block; width: 100%; height: 100%; padding: 5px; object-fit: contain; background: var(--bg); }
+.cred-badge svg { display: block; width: 40px; height: 40px; }
 .cred-badge::before, .cred-badge::after { content: ""; position: absolute; pointer-events: none; }
 .cred-badge::before {
   width: 13px; height: 13px; top: -7px; right: -15px; background: var(--accent);
@@ -552,12 +599,14 @@ a { color: inherit; }
   .cred-list li { grid-template-columns: 40px minmax(0, 1fr); }
   .cred-list li.has-badge { grid-template-columns: 88px minmax(0, 1fr); }
   .cred-year { grid-column: 2; }
+  .social { display: grid; grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .stack, .layer, .cursor-scale, .skill, .skill .pat, .menu, .menu-list a, .menu-cube { transition: none; }
   .cue-drop, .cue-roll { animation: none; }
   .lc, .loader-cube { animation: none; }
+  .has-drift .bg-lit { animation: none; opacity: .3; }
   .loader-cube { transform: rotateX(-28deg) rotateY(40deg); }
   .lc { transform: translate3d(calc(var(--x) * 9px), calc(var(--y) * 9px), calc(var(--z) * 9px)); }
 }
@@ -569,7 +618,7 @@ a { color: inherit; }
   <div class="loader-scene" aria-hidden="true"><div class="loader-cube"><span class="lc" style="--x:-1;--y:-1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:-1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:-1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc hot" style="--x:1;--y:-1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span></div></div>
   <p class="loader-text">Loading</p>
 </div>
-<a class="skip" href="#work">Skip to work</a>
+<a class="skip" href="#about">Skip to content</a>
 <div class="cursor" aria-hidden="true"><div class="cursor-scale"><div class="cursor-dir"><div class="cursor-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
 
 <header class="site-head">
@@ -592,9 +641,9 @@ a { color: inherit; }
   <div class="menu-inner">
     <nav aria-label="Sections">
       <ul class="menu-list">
-        <li><a href="#work"><span class="menu-word">Work</span></a></li>
         <li><a href="#about"><span class="menu-word">About</span></a></li>
         <li><a href="#experience"><span class="menu-word">Experience</span></a></li>
+        <li><a href="#work"><span class="menu-word">Work</span></a></li>
         <li><a href="#skills"><span class="menu-word">Skills</span></a></li>
         <li><a href="#contact"><span class="menu-word">Contact</span></a></li>
       </ul>
@@ -607,10 +656,78 @@ a { color: inherit; }
   <section class="hero" id="top" aria-labelledby="hero-name">
     <canvas class="corridor" aria-hidden="true"></canvas>
     <h1 class="hero-name" id="hero-name"><span class="hero-fit">Erdizah Ghodi Al&nbsp;Haidar</span></h1>
-    <a class="scroll-cue" href="#work" aria-label="Scroll down to selected work">
+    <a class="scroll-cue" href="#about" aria-label="Scroll down to the next section">
       <span class="cue-cube" aria-hidden="true"><span class="cue-drop"><span class="cue-iso"><span class="cue-roll"><i></i><i></i><i></i><i></i><i></i><i></i></span></span></span></span>
       <span aria-hidden="true">Scroll</span>
     </a>
+  </section>
+
+  <section class="section about" id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="about-title">About</h2>
+      </header>
+      <div class="about-grid">
+        <div class="cube-wrap">
+          <div class="cube-scene" aria-hidden="true">
+            <div class="cube">
+              <div class="face f1"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="#0B0F15" stroke-width=".7" opacity=".55"><path d="M16 14L46 8"/><path d="M16 14L46 26"/><path d="M16 14L46 44"/><path d="M16 14L46 62"/><path d="M16 34L46 8"/><path d="M16 34L46 26"/><path d="M16 34L46 44"/><path d="M16 34L46 62"/><path d="M16 54L46 8"/><path d="M16 54L46 26"/><path d="M16 54L46 44"/><path d="M16 54L46 62"/><path d="M46 8L78 24"/><path d="M46 8L78 46"/><path d="M46 26L78 24"/><path d="M46 26L78 46"/><path d="M46 44L78 24"/><path d="M46 44L78 46"/><path d="M46 62L78 24"/><path d="M46 62L78 46"/></g><path d="M16 34L46 26L78 46" fill="none" stroke="#E9E4D8" stroke-width="2"/><rect x="12.0" y="10.0" width="8" height="8" fill="#0B0F15"/><rect x="11.5" y="29.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/><rect x="12.0" y="50.0" width="8" height="8" fill="#0B0F15"/><rect x="42.0" y="4.0" width="8" height="8" fill="#0B0F15"/><rect x="41.5" y="21.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/><rect x="42.0" y="40.0" width="8" height="8" fill="#0B0F15"/><rect x="42.0" y="58.0" width="8" height="8" fill="#0B0F15"/><rect x="74.0" y="20.0" width="8" height="8" fill="#0B0F15"/><rect x="73.5" y="41.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/></svg><span>AI systems</span></div>
+              <div class="face f2"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 6V72H92" fill="none" stroke="#0B0F15" stroke-width=".9"/><path d="M12 59.0L90 5.0" stroke="#0B0F15" stroke-width=".6" stroke-dasharray="2 2"/><path d="M12 73.0L90 19.0" stroke="#0B0F15" stroke-width=".6" stroke-dasharray="2 2"/><rect x="15.7" y="65.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="23.7" y="57.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="31.7" y="63.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="39.7" y="55.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="43.7" y="47.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="51.7" y="61.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="59.7" y="53.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="67.7" y="61.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="75.7" y="47.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="17.7" y="37.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="25.7" y="25.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="33.7" y="35.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="41.7" y="19.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="49.7" y="23.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="57.7" y="11.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="65.7" y="9.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="37.7" y="9.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="21.7" y="13.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><path d="M12 66.0L90 12.0" stroke="#FF6A2B" stroke-width="2.2"/></svg><span>Machine learning</span></div>
+              <div class="face f3"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g fill="#E9E4D8"><rect x="30.2" y="7" width="1.6" height="7"/><rect x="30.2" y="58" width="1.6" height="7"/><rect x="21" y="16.2" width="7" height="1.6"/><rect x="72" y="16.2" width="7" height="1.6"/><rect x="36.5" y="7" width="1.6" height="7"/><rect x="36.5" y="58" width="1.6" height="7"/><rect x="21" y="22.5" width="7" height="1.6"/><rect x="72" y="22.5" width="7" height="1.6"/><rect x="42.8" y="7" width="1.6" height="7"/><rect x="42.8" y="58" width="1.6" height="7"/><rect x="21" y="28.8" width="7" height="1.6"/><rect x="72" y="28.8" width="7" height="1.6"/><rect x="49.1" y="7" width="1.6" height="7"/><rect x="49.1" y="58" width="1.6" height="7"/><rect x="21" y="35.1" width="7" height="1.6"/><rect x="72" y="35.1" width="7" height="1.6"/><rect x="55.4" y="7" width="1.6" height="7"/><rect x="55.4" y="58" width="1.6" height="7"/><rect x="21" y="41.4" width="7" height="1.6"/><rect x="72" y="41.4" width="7" height="1.6"/><rect x="61.7" y="7" width="1.6" height="7"/><rect x="61.7" y="58" width="1.6" height="7"/><rect x="21" y="47.7" width="7" height="1.6"/><rect x="72" y="47.7" width="7" height="1.6"/><rect x="68.0" y="7" width="1.6" height="7"/><rect x="68.0" y="58" width="1.6" height="7"/><rect x="21" y="54.0" width="7" height="1.6"/><rect x="72" y="54.0" width="7" height="1.6"/></g><rect x="28" y="14" width="44" height="44" fill="#0E1620" stroke="#E9E4D8" stroke-width=".8"/><rect x="31.2" y="17.2" width="5" height="5" fill="#FF6A2B"/><rect x="31.2" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="36.4" width="5" height="5" fill="#FF6A2B"/><rect x="31.2" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="30.0" width="5" height="5" fill="#FF6A2B"/><rect x="37.6" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="49.2" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="23.6" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="42.8" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="17.2" width="5" height="5" fill="#FF6A2B"/><rect x="50.4" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="36.4" width="5" height="5" fill="#FF6A2B"/><rect x="50.4" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="30.0" width="5" height="5" fill="#FF6A2B"/><rect x="56.8" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="49.2" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="23.6" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="42.8" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="49.2" width="5" height="5" fill="#5A6B80"/></svg><span>High-performance computing</span></div>
+              <div class="face f4"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="32" y="5" width="36" height="66" fill="#0E1620" stroke="#E9E4D8" stroke-width="1.6"/><rect x="46" y="8" width="8" height="1.4" fill="#E9E4D8"/><rect x="36.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="36.5" y="24" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="24" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="24" width="7" height="7" fill="#FF6A2B"/><rect x="36.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="36.0" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="40.8" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="45.6" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="50.4" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="55.2" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="60.0" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="39.2" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="44.0" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="53.6" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="58.4" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="48" y="64.5" width="4" height="4" fill="none" stroke="#E9E4D8" stroke-width=".9"/></svg><span>Mobile apps</span></div>
+              <div class="face f5"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="5" width="46" height="60" fill="#B3AA96" stroke="#0B0F15" stroke-width=".6"/><rect x="30" y="11" width="48" height="62" fill="#F4EFE3" stroke="#0B0F15" stroke-width=".9"/><rect x="35" y="16" width="32" height="3.4" fill="#0B0F15"/><rect x="35" y="22" width="18" height="1.6" fill="#6B6558"/><rect x="35" y="27.0" width="37" height="1.3" fill="#6B6558"/><rect x="35" y="30.2" width="35" height="1.3" fill="#6B6558"/><rect x="35" y="33.4" width="31" height="1.3" fill="#6B6558"/><rect x="35" y="38" width="38" height="21" fill="none" stroke="#0B0F15" stroke-width=".7"/><polyline points="37,56 43,49 49,45.5 55,43.5 61,42.5 67,41.5 71,41" fill="none" stroke="#FF6A2B" stroke-width="1.6"/><polyline points="37,56 43,53 49,51 55,49.5 61,48.6 67,48 71,47.6" fill="none" stroke="#0B0F15" stroke-width="1" stroke-dasharray="2 1.4"/><rect x="35" y="62" width="26" height="1.3" fill="#6B6558"/><rect x="35" y="65.5" width="33" height="1.3" fill="#6B6558"/></svg><span>Research</span></div>
+              <div class="face f6"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M65.7 24.5A5 5 0 0 1 74.3 24.5" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><path d="M61.3 22.0A10 10 0 0 1 78.7 22.0" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><path d="M57.0 19.5A15 15 0 0 1 83.0 19.5" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><rect x="16" y="32" width="54" height="34" fill="#3E5468" stroke="#E9E4D8" stroke-width=".7"/><g fill="#F2B544"><rect x="20" y="34.5" width="2.6" height="2.6"/><rect x="25" y="34.5" width="2.6" height="2.6"/><rect x="30" y="34.5" width="2.6" height="2.6"/><rect x="35" y="34.5" width="2.6" height="2.6"/><rect x="40" y="34.5" width="2.6" height="2.6"/><rect x="45" y="34.5" width="2.6" height="2.6"/><rect x="50" y="34.5" width="2.6" height="2.6"/><rect x="55" y="34.5" width="2.6" height="2.6"/><rect x="60" y="34.5" width="2.6" height="2.6"/><rect x="65" y="34.5" width="2.6" height="2.6"/></g><rect x="35" y="43" width="17" height="17" fill="#0B0F15" stroke="#E9E4D8" stroke-width=".6"/><g fill="#E9E4D8"><rect x="32" y="45.0" width="3" height="1.2"/><rect x="52" y="45.0" width="3" height="1.2"/><rect x="32" y="48.6" width="3" height="1.2"/><rect x="52" y="48.6" width="3" height="1.2"/><rect x="32" y="52.2" width="3" height="1.2"/><rect x="52" y="52.2" width="3" height="1.2"/><rect x="32" y="55.8" width="3" height="1.2"/><rect x="52" y="55.8" width="3" height="1.2"/></g><rect x="11" y="46" width="6" height="9" fill="#8FA3B0"/><rect x="61" y="58" width="4" height="4" fill="#FF6A2B"/><path d="M70 52H80" stroke="#E9E4D8" stroke-width=".8" stroke-dasharray="2 1.6"/><rect x="80" y="47" width="10" height="10" fill="none" stroke="#E9E4D8" stroke-width="1.2"/><rect x="83.5" y="50.5" width="3" height="3" fill="#E9E4D8"/></svg><span>IoT and hardware</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="about-copy">
+          <p>I'm Erdi. I study Computer Science at Universitas Gadjah Mada, and most of my projects sit where models meet machines: how a loss function shapes training, how much memory an LLM needs while it generates, and how much faster a pipeline runs once it moves to a GPU.</p>
+          <p>I write C++ when I want to see every operation, Python when I need to test an idea quickly, and Dart when an idea has to become an app people can hold. I'm working toward a role as an AI engineer or systems engineer.</p>
+          <dl class="facts">
+            <dt>Study</dt><dd>Computer Science, Universitas Gadjah Mada, third year</dd>
+            <dt>Focus</dt><dd>AI systems, machine learning, high-performance computing</dd>
+            <dt>Languages</dt><dd>C++, Python, Dart</dd>
+          </dl>
+                    <ul class="social" aria-label="Find me elsewhere">
+            <li><a class="soc" href="mailto:ghodierdizah@gmail.com">Email</a></li>
+            <li><a class="soc" href="https://github.com/GreyCoatedCat">GitHub</a></li>
+            <li><a class="soc" href="https://www.linkedin.com/in/erdizah">LinkedIn</a></li>
+            <li><a class="soc" href="https://www.instagram.com/erdizah">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt experience" id="experience" aria-labelledby="experience-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="experience-title">Experience</h2>
+      </header>
+      <!-- newest first; copy an <li class="xp-item"> block per role, and keep "is-now" only on a role you still hold -->
+      <ol class="xp">
+        <li class="xp-item is-now">
+          <p class="xp-time">[Mon YYYY] &ndash; Present</p>
+          <span class="xp-node" aria-hidden="true"></span>
+          <div class="xp-body">
+            <h3>[Role]</h3>
+            <p class="xp-org">[Company or lab] &middot; [Internship, part-time or full-time]</p>
+            <p>[One or two sentences on what you built or improved there, with a number if you have one.]</p>
+            <ul class="tags"><li>[Tool]</li><li>[Tool]</li><li>[Tool]</li></ul>
+          </div>
+        </li>
+        <li class="xp-item">
+          <p class="xp-time">[Mon YYYY] &ndash; [Mon YYYY]</p>
+          <span class="xp-node" aria-hidden="true"></span>
+          <div class="xp-body">
+            <h3>[Role]</h3>
+            <p class="xp-org">[Company or lab] &middot; [Internship, part-time or full-time]</p>
+            <p>[One or two sentences on what you built or improved there, with a number if you have one.]</p>
+            <ul class="tags"><li>[Tool]</li><li>[Tool]</li></ul>
+          </div>
+        </li>
+      </ol>
+    </div>
   </section>
 
   <section class="section work" id="work" aria-labelledby="work-title">
@@ -650,6 +767,17 @@ a { color: inherit; }
             <p>A Flutter app that turns hand and finger therapy exercises into songs played on a MIDI keyboard. Available in English and Japanese.</p>
             <ul class="tags"><li>Flutter</li><li>Dart</li><li>MIDI</li></ul>
             <a class="tile-link" href="#">View project</a><!-- replace # with the project link -->
+          </div>
+        </article>
+
+        <article class="tile">
+          <div class="cover" aria-hidden="true"><div class="stack"><svg class="layer" style="--i:0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" style="fill:var(--ink)"/><rect x="8" y="8" width="84" height="84" fill="none" style="stroke:var(--mid)" stroke-width="0.6"/><path d="M18 92C18 62 20 36 33 24C39 19 45 17 50 17C55 17 61 19 67 24C80 36 82 62 82 92Z" style="fill:var(--mid)"/></svg><svg class="layer" style="--i:1" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M45 27C37 25 27 35 25 51C23 65 25 75 31 79C37 81 43 77 45 71Z" style="fill:var(--ink)"/><path d="M55 27C63 25 73 35 75 51C77 65 75 75 69 79C63 81 57 77 55 71Z" style="fill:var(--ink)"/><g fill="none" style="stroke:var(--soft)" stroke-width="0.55" opacity=".55"><path d="M24 33Q50 25 76 33"/><path d="M24 41Q50 33 76 41"/><path d="M24 49Q50 41 76 49"/><path d="M24 57Q50 49 76 57"/><path d="M24 65Q50 57 76 65"/><path d="M24 73Q50 65 76 73"/></g><g style="fill:var(--soft)" opacity=".8"><rect x="47.2" y="20.0" width="5.6" height="4.4"/><rect x="47.2" y="26.2" width="5.6" height="4.4"/><rect x="47.2" y="32.4" width="5.6" height="4.4"/><rect x="47.2" y="38.6" width="5.6" height="4.4"/><rect x="47.2" y="44.8" width="5.6" height="4.4"/><rect x="47.2" y="51.0" width="5.6" height="4.4"/><rect x="47.2" y="57.2" width="5.6" height="4.4"/><rect x="47.2" y="63.4" width="5.6" height="4.4"/><rect x="47.2" y="69.6" width="5.6" height="4.4"/><rect x="47.2" y="75.8" width="5.6" height="4.4"/><rect x="47.2" y="82.0" width="5.6" height="4.4"/></g></svg><svg class="layer" style="--i:2" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M45 27C37 25 27 35 25 51C23 65 25 75 31 79C37 81 43 77 45 71Z" fill="none" style="stroke:var(--acc-l)" stroke-width="1.2"/><path d="M55 27C63 25 73 35 75 51C77 65 75 75 69 79C63 81 57 77 55 71Z" fill="none" style="stroke:var(--acc-l)" stroke-width="1.2"/><path d="M14 22V14H22M78 14H86V22M86 78V86H78M22 86H14V78" fill="none" style="stroke:var(--paper)" stroke-width="1"/><rect x="61" y="19" width="17" height="6" style="fill:var(--acc-fill)"/><text x="62.3" y="23.4" font-size="3.9" font-family="Overpass, Archivo, sans-serif" font-weight="700" style="fill:var(--ink)">TB 0.92</text></svg></div></div>
+          <div class="tile-body">
+            <h3>Tuberculosis screening from chest X-rays</h3>
+            <p class="tile-meta">Digital Image Processing course, team of four</p>
+            <p>A classic image-processing pipeline instead of a deep network: enhancement, lung segmentation with Otsu thresholding and morphology, then intensity, histogram and HOG features for an SVM. After tuning it reached 91.9% accuracy on 1,400 held-out X-rays, and a Flask app shows the lung mask and the call for any uploaded image.</p>
+            <ul class="tags"><li>OpenCV</li><li>scikit-learn</li><li>SVM</li><li>Flask</li></ul>
+            <a class="tile-link" href="https://github.com/gracella12/PCD_Group6_FinalProject">View project</a>
           </div>
         </article>
 
@@ -696,68 +824,6 @@ a { color: inherit; }
           <li><span class="row-title"><a class="row-link" href="#">Multi-domain sentiment analysis</a></span><span>A systematic literature review of machine-learning and deep-learning methods.</span><span class="row-ctx">Research Methodology course, team project</span></li>
         </ul>
       </div>
-    </div>
-  </section>
-
-  <section class="section alt about" id="about" aria-labelledby="about-title">
-    <div class="wrap">
-      <header class="sec-head">
-        <h2 id="about-title">About</h2>
-      </header>
-      <div class="about-grid">
-        <div class="cube-wrap">
-          <div class="cube-scene" aria-hidden="true">
-            <div class="cube">
-              <div class="face f1"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g stroke="#0B0F15" stroke-width=".7" opacity=".55"><path d="M16 14L46 8"/><path d="M16 14L46 26"/><path d="M16 14L46 44"/><path d="M16 14L46 62"/><path d="M16 34L46 8"/><path d="M16 34L46 26"/><path d="M16 34L46 44"/><path d="M16 34L46 62"/><path d="M16 54L46 8"/><path d="M16 54L46 26"/><path d="M16 54L46 44"/><path d="M16 54L46 62"/><path d="M46 8L78 24"/><path d="M46 8L78 46"/><path d="M46 26L78 24"/><path d="M46 26L78 46"/><path d="M46 44L78 24"/><path d="M46 44L78 46"/><path d="M46 62L78 24"/><path d="M46 62L78 46"/></g><path d="M16 34L46 26L78 46" fill="none" stroke="#E9E4D8" stroke-width="2"/><rect x="12.0" y="10.0" width="8" height="8" fill="#0B0F15"/><rect x="11.5" y="29.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/><rect x="12.0" y="50.0" width="8" height="8" fill="#0B0F15"/><rect x="42.0" y="4.0" width="8" height="8" fill="#0B0F15"/><rect x="41.5" y="21.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/><rect x="42.0" y="40.0" width="8" height="8" fill="#0B0F15"/><rect x="42.0" y="58.0" width="8" height="8" fill="#0B0F15"/><rect x="74.0" y="20.0" width="8" height="8" fill="#0B0F15"/><rect x="73.5" y="41.5" width="9" height="9" fill="#E9E4D8" stroke="#0B0F15" stroke-width="1.2"/></svg><span>AI systems</span></div>
-              <div class="face f2"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 6V72H92" fill="none" stroke="#0B0F15" stroke-width=".9"/><path d="M12 59.0L90 5.0" stroke="#0B0F15" stroke-width=".6" stroke-dasharray="2 2"/><path d="M12 73.0L90 19.0" stroke="#0B0F15" stroke-width=".6" stroke-dasharray="2 2"/><rect x="15.7" y="65.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="23.7" y="57.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="31.7" y="63.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="39.7" y="55.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="43.7" y="47.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="51.7" y="61.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="59.7" y="53.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="67.7" y="61.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="75.7" y="47.7" width="4.6" height="4.6" fill="#0B0F15"/><rect x="17.7" y="37.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="25.7" y="25.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="33.7" y="35.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="41.7" y="19.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="49.7" y="23.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="57.7" y="11.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="65.7" y="9.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="37.7" y="9.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><rect x="21.7" y="13.7" width="4.6" height="4.6" fill="none" stroke="#0B0F15" stroke-width="1.1"/><path d="M12 66.0L90 12.0" stroke="#FF6A2B" stroke-width="2.2"/></svg><span>Machine learning</span></div>
-              <div class="face f3"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><g fill="#E9E4D8"><rect x="30.2" y="7" width="1.6" height="7"/><rect x="30.2" y="58" width="1.6" height="7"/><rect x="21" y="16.2" width="7" height="1.6"/><rect x="72" y="16.2" width="7" height="1.6"/><rect x="36.5" y="7" width="1.6" height="7"/><rect x="36.5" y="58" width="1.6" height="7"/><rect x="21" y="22.5" width="7" height="1.6"/><rect x="72" y="22.5" width="7" height="1.6"/><rect x="42.8" y="7" width="1.6" height="7"/><rect x="42.8" y="58" width="1.6" height="7"/><rect x="21" y="28.8" width="7" height="1.6"/><rect x="72" y="28.8" width="7" height="1.6"/><rect x="49.1" y="7" width="1.6" height="7"/><rect x="49.1" y="58" width="1.6" height="7"/><rect x="21" y="35.1" width="7" height="1.6"/><rect x="72" y="35.1" width="7" height="1.6"/><rect x="55.4" y="7" width="1.6" height="7"/><rect x="55.4" y="58" width="1.6" height="7"/><rect x="21" y="41.4" width="7" height="1.6"/><rect x="72" y="41.4" width="7" height="1.6"/><rect x="61.7" y="7" width="1.6" height="7"/><rect x="61.7" y="58" width="1.6" height="7"/><rect x="21" y="47.7" width="7" height="1.6"/><rect x="72" y="47.7" width="7" height="1.6"/><rect x="68.0" y="7" width="1.6" height="7"/><rect x="68.0" y="58" width="1.6" height="7"/><rect x="21" y="54.0" width="7" height="1.6"/><rect x="72" y="54.0" width="7" height="1.6"/></g><rect x="28" y="14" width="44" height="44" fill="#0E1620" stroke="#E9E4D8" stroke-width=".8"/><rect x="31.2" y="17.2" width="5" height="5" fill="#FF6A2B"/><rect x="31.2" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="36.4" width="5" height="5" fill="#FF6A2B"/><rect x="31.2" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="31.2" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="30.0" width="5" height="5" fill="#FF6A2B"/><rect x="37.6" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="37.6" y="49.2" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="23.6" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="44.0" y="42.8" width="5" height="5" fill="#FF6A2B"/><rect x="44.0" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="17.2" width="5" height="5" fill="#FF6A2B"/><rect x="50.4" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="36.4" width="5" height="5" fill="#FF6A2B"/><rect x="50.4" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="50.4" y="49.2" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="23.6" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="30.0" width="5" height="5" fill="#FF6A2B"/><rect x="56.8" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="42.8" width="5" height="5" fill="#5A6B80"/><rect x="56.8" y="49.2" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="17.2" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="23.6" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="30.0" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="36.4" width="5" height="5" fill="#5A6B80"/><rect x="63.2" y="42.8" width="5" height="5" fill="#FF6A2B"/><rect x="63.2" y="49.2" width="5" height="5" fill="#5A6B80"/></svg><span>High-performance computing</span></div>
-              <div class="face f4"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="32" y="5" width="36" height="66" fill="#0E1620" stroke="#E9E4D8" stroke-width="1.6"/><rect x="46" y="8" width="8" height="1.4" fill="#E9E4D8"/><rect x="36.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="14" width="7" height="7" fill="#E9E4D8"/><rect x="36.5" y="24" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="24" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="24" width="7" height="7" fill="#FF6A2B"/><rect x="36.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="46.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="56.5" y="34" width="7" height="7" fill="#E9E4D8"/><rect x="36.0" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="40.8" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="45.6" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="50.4" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="55.2" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="60.0" y="47" width="4.2" height="14" fill="#E9E4D8"/><rect x="39.2" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="44.0" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="53.6" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="58.4" y="47" width="2.6" height="8" fill="#0B0F15"/><rect x="48" y="64.5" width="4" height="4" fill="none" stroke="#E9E4D8" stroke-width=".9"/></svg><span>Mobile apps</span></div>
-              <div class="face f5"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="5" width="46" height="60" fill="#B3AA96" stroke="#0B0F15" stroke-width=".6"/><rect x="30" y="11" width="48" height="62" fill="#F4EFE3" stroke="#0B0F15" stroke-width=".9"/><rect x="35" y="16" width="32" height="3.4" fill="#0B0F15"/><rect x="35" y="22" width="18" height="1.6" fill="#6B6558"/><rect x="35" y="27.0" width="37" height="1.3" fill="#6B6558"/><rect x="35" y="30.2" width="35" height="1.3" fill="#6B6558"/><rect x="35" y="33.4" width="31" height="1.3" fill="#6B6558"/><rect x="35" y="38" width="38" height="21" fill="none" stroke="#0B0F15" stroke-width=".7"/><polyline points="37,56 43,49 49,45.5 55,43.5 61,42.5 67,41.5 71,41" fill="none" stroke="#FF6A2B" stroke-width="1.6"/><polyline points="37,56 43,53 49,51 55,49.5 61,48.6 67,48 71,47.6" fill="none" stroke="#0B0F15" stroke-width="1" stroke-dasharray="2 1.4"/><rect x="35" y="62" width="26" height="1.3" fill="#6B6558"/><rect x="35" y="65.5" width="33" height="1.3" fill="#6B6558"/></svg><span>Research</span></div>
-              <div class="face f6"><svg class="face-art" viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M65.7 24.5A5 5 0 0 1 74.3 24.5" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><path d="M61.3 22.0A10 10 0 0 1 78.7 22.0" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><path d="M57.0 19.5A15 15 0 0 1 83.0 19.5" fill="none" stroke="#FF6A2B" stroke-width="1.8"/><rect x="16" y="32" width="54" height="34" fill="#3E5468" stroke="#E9E4D8" stroke-width=".7"/><g fill="#F2B544"><rect x="20" y="34.5" width="2.6" height="2.6"/><rect x="25" y="34.5" width="2.6" height="2.6"/><rect x="30" y="34.5" width="2.6" height="2.6"/><rect x="35" y="34.5" width="2.6" height="2.6"/><rect x="40" y="34.5" width="2.6" height="2.6"/><rect x="45" y="34.5" width="2.6" height="2.6"/><rect x="50" y="34.5" width="2.6" height="2.6"/><rect x="55" y="34.5" width="2.6" height="2.6"/><rect x="60" y="34.5" width="2.6" height="2.6"/><rect x="65" y="34.5" width="2.6" height="2.6"/></g><rect x="35" y="43" width="17" height="17" fill="#0B0F15" stroke="#E9E4D8" stroke-width=".6"/><g fill="#E9E4D8"><rect x="32" y="45.0" width="3" height="1.2"/><rect x="52" y="45.0" width="3" height="1.2"/><rect x="32" y="48.6" width="3" height="1.2"/><rect x="52" y="48.6" width="3" height="1.2"/><rect x="32" y="52.2" width="3" height="1.2"/><rect x="52" y="52.2" width="3" height="1.2"/><rect x="32" y="55.8" width="3" height="1.2"/><rect x="52" y="55.8" width="3" height="1.2"/></g><rect x="11" y="46" width="6" height="9" fill="#8FA3B0"/><rect x="61" y="58" width="4" height="4" fill="#FF6A2B"/><path d="M70 52H80" stroke="#E9E4D8" stroke-width=".8" stroke-dasharray="2 1.6"/><rect x="80" y="47" width="10" height="10" fill="none" stroke="#E9E4D8" stroke-width="1.2"/><rect x="83.5" y="50.5" width="3" height="3" fill="#E9E4D8"/></svg><span>IoT and hardware</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="about-copy">
-          <p>I'm Erdi. I study Computer Science at Universitas Gadjah Mada, and most of my projects sit where models meet machines: how a loss function shapes training, how much memory an LLM needs while it generates, and how much faster a pipeline runs once it moves to a GPU.</p>
-          <p>I write C++ when I want to see every operation, Python when I need to test an idea quickly, and Dart when an idea has to become an app people can hold. I'm working toward a role as an AI engineer or systems engineer.</p>
-          <dl class="facts">
-            <dt>Study</dt><dd>Computer Science, Universitas Gadjah Mada, third year</dd>
-            <dt>Focus</dt><dd>AI systems, machine learning, high-performance computing</dd>
-            <dt>Languages</dt><dd>C++, Python, Dart</dd>
-          </dl>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section experience" id="experience" aria-labelledby="experience-title">
-    <div class="wrap">
-      <header class="sec-head">
-        <h2 id="experience-title">Experience</h2>
-      </header>
-      <!-- newest first; copy an <li class="xp-item"> block per role, and keep "is-now" only on a role you still hold -->
-      <ol class="xp">
-        <li class="xp-item is-now">
-          <p class="xp-time">[Mon YYYY] &ndash; Present</p>
-          <span class="xp-node" aria-hidden="true"></span>
-          <div class="xp-body">
-            <h3>[Role]</h3>
-            <p class="xp-org">[Company or lab] &middot; [Internship, part-time or full-time]</p>
-            <p>[One or two sentences on what you built or improved there, with a number if you have one.]</p>
-            <ul class="tags"><li>[Tool]</li><li>[Tool]</li><li>[Tool]</li></ul>
-          </div>
-        </li>
-        <li class="xp-item">
-          <p class="xp-time">[Mon YYYY] &ndash; [Mon YYYY]</p>
-          <span class="xp-node" aria-hidden="true"></span>
-          <div class="xp-body">
-            <h3>[Role]</h3>
-            <p class="xp-org">[Company or lab] &middot; [Internship, part-time or full-time]</p>
-            <p>[One or two sentences on what you built or improved there, with a number if you have one.]</p>
-            <ul class="tags"><li>[Tool]</li><li>[Tool]</li></ul>
-          </div>
-        </li>
-      </ol>
     </div>
   </section>
 
@@ -818,14 +884,14 @@ a { color: inherit; }
         <div>
           <h3 class="sub-h">Certifications</h3>
           <ul class="cred-list">
-            <li class="has-badge"><span class="cred-badge"><img src="aws-certified-ai-practitioner.png" alt="AWS Certified AI Practitioner badge" width="64" height="64" loading="lazy" onerror="this.remove()"><!-- save your official badge image next to index.html with this file name --></span><span><strong>AWS Certified AI Practitioner</strong><span class="cred-sub">Amazon Web Services</span><a class="cred-link" href="#">View credential</a><!-- replace # with the credential link --></span><span class="cred-year">[Year]</span></li>
+            <li class="has-badge"><span class="cred-badge"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="4" width="25" height="31" fill="#E9E4D8"/><rect x="9" y="9" width="17" height="2.4" fill="#0E1620"/><rect x="9" y="14" width="12" height="2" fill="#3E5468"/><rect x="9" y="18.5" width="14" height="2" fill="#3E5468"/><rect x="25" y="34" width="4" height="6" fill="#C24817"/><rect x="31" y="34" width="4" height="6" fill="#C24817"/><rect x="22" y="21" width="16" height="15" fill="#FF6A2B"/><rect x="26" y="25" width="8" height="7" fill="none" stroke="#0E1620" stroke-width="1.6"/></svg></span><span><strong>AWS Certified AI Practitioner</strong><span class="cred-sub">Amazon Web Services</span><a class="cred-link" href="https://cp.certmetrics.com/amazon/en/public/verify/credential/c1fada1c3a3f4ed29a84805037094c0b">View credential</a></span><span class="cred-year">[Year]</span></li>
           </ul>
         </div>
         <div>
           <h3 class="sub-h">Competitions</h3>
           <ul class="cred-list">
-            <li class="has-badge"><span class="cred-badge is-comp"><img src="competition-logo.png" alt="[Competition name] logo" width="64" height="64" loading="lazy" onerror="this.remove()"><!-- save the competition logo next to index.html with this file name --></span><span><strong>[Competition name]</strong><span class="cred-sub">AI product competition. Semifinalist with TELITI.</span><a class="cred-link" href="#">View certificate</a><!-- replace # with the certificate link --></span><span class="cred-year">2026</span></li>
-            <li class="has-badge"><span class="cred-badge is-comp"><img src="logika-ui-logo.png" alt="Logika UI logo" width="64" height="64" loading="lazy" onerror="this.remove()"><!-- save the Logika UI logo next to index.html with this file name --></span><span><strong>Data Science Competition Logika UI</strong><span class="cred-sub">Credit default prediction on Kaggle.</span><a class="cred-link" href="#">View certificate</a><!-- replace # with the certificate link --></span><span class="cred-year">2026</span></li>
+            <li class="has-badge"><span class="cred-badge is-comp"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 8H12V10H8V14H12V16H6Z" fill="#FF6A2B"/><path d="M34 8H28V10H32V14H28V16H34Z" fill="#FF6A2B"/><rect x="12" y="5" width="16" height="14" fill="#FF6A2B"/><rect x="14" y="19" width="12" height="3" fill="#C24817"/><rect x="15" y="7.5" width="3" height="8.5" fill="#FFB08A"/><rect x="18" y="22" width="4" height="6" fill="#E9E4D8"/><rect x="13" y="28" width="14" height="3" fill="#E9E4D8"/><rect x="10" y="31" width="20" height="5" fill="#C9C0AC"/></svg></span><span><strong>[Competition name]</strong><span class="cred-sub">AI product competition. Semifinalist with TELITI.</span><a class="cred-link" href="#">View certificate</a><!-- replace # with the certificate link --></span><span class="cred-year">2026</span></li>
+            <li class="has-badge"><span class="cred-badge is-comp"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 8H12V10H8V14H12V16H6Z" fill="#FF6A2B"/><path d="M34 8H28V10H32V14H28V16H34Z" fill="#FF6A2B"/><rect x="12" y="5" width="16" height="14" fill="#FF6A2B"/><rect x="14" y="19" width="12" height="3" fill="#C24817"/><rect x="15" y="7.5" width="3" height="8.5" fill="#FFB08A"/><rect x="18" y="22" width="4" height="6" fill="#E9E4D8"/><rect x="13" y="28" width="14" height="3" fill="#E9E4D8"/><rect x="10" y="31" width="20" height="5" fill="#C9C0AC"/></svg></span><span><strong>Data Science Competition Logika UI</strong><span class="cred-sub">Credit default prediction on Kaggle.</span><a class="cred-link" href="#">View certificate</a><!-- replace # with the certificate link --></span><span class="cred-year">2026</span></li>
           </ul>
         </div>
       </div>
@@ -839,9 +905,10 @@ a { color: inherit; }
       </header>
       <div class="contact-grid">
         <ul class="links">
-          <li><span class="k">Email</span><a href="mailto:you@example.com">[your email]</a></li>
-          <li><span class="k">GitHub</span><a href="https://github.com/">github.com/[username]</a></li>
-          <li><span class="k">LinkedIn</span><a href="https://www.linkedin.com/">linkedin.com/in/[username]</a></li>
+          <li><span class="k">Email</span><a href="mailto:ghodierdizah@gmail.com">ghodierdizah@gmail.com</a></li>
+          <li><span class="k">GitHub</span><a href="https://github.com/GreyCoatedCat">github.com/GreyCoatedCat</a></li>
+          <li><span class="k">LinkedIn</span><a href="https://www.linkedin.com/in/erdizah">linkedin.com/in/erdizah</a></li>
+          <li><span class="k">Instagram</span><a href="https://www.instagram.com/erdizah">instagram.com/erdizah</a></li>
         </ul>
         <div class="city-wrap">
           <div class="city" role="img" aria-label="A small city of blocks inside a cube, with rooms lit from inside, a courtyard tree, two towers and a bridge. A little blue cube walks its stairs and paths."><canvas aria-hidden="true"></canvas></div>
@@ -872,6 +939,7 @@ a { color: inherit; }
   const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
   const hits = (A, B) => A[0] < B[1] && A[1] > B[0] && A[2] < B[3] && A[3] > B[2] && A[4] < B[5] && A[5] > B[4];
   const TAU = Math.PI * 2;
+  const COARSE = window.matchMedia('(pointer: coarse)').matches;
   // Opening shot, in seconds from the moment the loading screen lifts
   const INTRO = { dolly: 5.6, back: 1.8, light: 0.55, reveal: 3.0, pop: 2.6, end: 6.2 };
   const CHIPS = ['#FF6A2B', '#E9E4D8', '#7F9BB5'];
@@ -917,6 +985,9 @@ a { color: inherit; }
         lightNear: 0.36, vignette: false, jumper: false, intro: false,
       }, opts);
       const o = this.o, T = this.t = {};
+      // quality: 0 full, 1 lighter, 2 lightest. Phones start at 1; any device steps down if frames run long.
+      this.q = -1; this.slowFor = 0; this.ema = 1 / 60;
+      this.setQuality(COARSE || window.innerWidth < 700 ? 1 : 0, true);
       for (const k of ['dark', 'light', 'accent', 'box', 'cube', 'wire']) T[k] = THEME[k].map(hex);
       T.lo = hex(THEME.lo); T.hi = hex(THEME.hi); T.haze = hex(THEME.haze);
       T.char = THEME.char.map(hex);
@@ -952,6 +1023,28 @@ a { color: inherit; }
       if (o.jumper) { this.updateJumper(0); this.draw(); }
     }
 
+    setQuality(q, initial) {
+      if (q === this.q) return;
+      this.q = q;
+      const far = this.o.far;
+      this.dprCap = [1.75, 1.25, 1][q];
+      this.boxFar = far * [0.75, 0.55, 0.42][q];  // blocks further out than this are left to the haze (they fade in)
+      this.mergeFar = [99, 7, 5][q];              // past this a wall slice is one plain plane plus its accent tiles
+      this.shadowFar = [99, 7, 5][q];
+      this.patFar = [9, 6, 4][q];                 // wall stripes only up close
+      this.seamFar = [8, 5, 0][q];
+      this.rimFar = [99, 6, 3.5][q];               // the bright top edge on blocks
+      this.drawFar = far * [1, 0.85, 0.75][q];     // the last stretch is almost pure haze under the glow
+      if (!initial) this.resize();
+    }
+    // Watches real frame times; if the scene keeps running under ~40fps it drops a quality step (never back up).
+    govern(raw) {
+      if (!(raw > 0) || raw > 0.25) return;
+      this.ema += (raw - this.ema) * 0.08;
+      if (this.q >= 2 || this.introT < 0) return;
+      this.slowFor = this.ema > 1 / 40 ? this.slowFor + raw : 0;
+      if (this.slowFor > 1.2) { this.slowFor = 0; this.ema = 1 / 60; this.setQuality(this.q + 1); }
+    }
     playIntro() { this.introT = 0; this.j.mode = 'hold'; }
     skipIntro() { this.introT = 99; if (this.j.mode === 'hold') this.j.mode = 'idle'; if (!this.running) this.draw(); }
     // The opening push-in: the camera starts a little way back and glides forward, slowing to its usual pace.
@@ -969,7 +1062,7 @@ a { color: inherit; }
 
     resize() {
       const r = this.canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, this.dprCap || 1.75);
       this.w = Math.max(1, r.width); this.h = Math.max(1, r.height);
       this.canvas.width = Math.round(this.w * dpr); this.canvas.height = Math.round(this.h * dpr);
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1073,27 +1166,30 @@ a { color: inherit; }
     segment(k, zA, zB, rel, extra) {
       const o = this.o, T = this.t, seed = o.seed, L = o.seg, zS = k * L;
       const lf = this.lightAt(rel), hz = this.hazeAt(rel);
+      this.segRel = rel;
       const groupDark = rand(Math.floor(k / 3), 1, seed) < 0.55;
       const dark = rand(k, 2, seed) < 0.72 ? groupDark : !groupDark;
       const pal = dark ? T.dark : T.light;
       const base = pal[Math.floor(rand(k, 3, seed) * pal.length)];
-      const patterns = rel < 9, items = this.items;
+      const patterns = rel < this.patFar, items = this.items;
       items.length = 0;
+      const merge = rel > this.mergeFar;
       for (let w = 0; w < 4; w++) {
         const m = this.tiles(k, w), f = lf * WALL[w];
+        if (merge) this.poly(w, [-1, 0, zA, 1, 0, zA, 1, 0, zB, -1, 0, zB], this.shade(base, f, hz), false);
         for (let i = 0; i < m; i++) {
           const u0 = -1 + (2 * i) / m, u1 = -1 + (2 * (i + 1)) / m;
           const id = k * 16 + w * 4 + i;
           const r = rand(id, 20, seed);
           const col = r < o.accentP ? T.accent[Math.floor((r / o.accentP) * T.accent.length)] : base;
-          this.poly(w, [u0, 0, zA, u1, 0, zA, u1, 0, zB, u0, 0, zB], this.shade(col, f, hz), rel < 8);
+          if (!merge || col !== base) this.poly(w, [u0, 0, zA, u1, 0, zA, u1, 0, zB, u0, 0, zB], this.shade(col, f, hz), rel < this.seamFar);
           if (patterns && rand(id, 40, seed) < o.patternP) this.pattern(w, id, u0, u1, zS, zA, zB, col, f, hz);
           const b = this.boxAt(k, w, i, m);
-          if (b && rel < o.far * 0.75) items.push(b);
+          if (b && rel < this.boxFar) items.push(b);
         }
       }
       // contact shadows go down first, so none of them lands on a neighbouring block
-      for (const b of items) this.shadow(b, zA, zB, hz);
+      if (rel < this.shadowFar) for (const b of items) this.shadow(b, zA, zB, hz);
       // every few metres a square frame runs round all four walls, like the rings in the reference posters
       if (o.ribEvery && k % o.ribEvery === 0 && rel < o.far * 0.8 && zS + L * 0.32 > zA) items.push({ key: zS + L * 0.16, rib: true });
       if (extra) for (const it of extra) items.push(it);
@@ -1103,7 +1199,12 @@ a { color: inherit; }
         if (it.rib) { const r1 = zS + L * 0.32; for (let w = 0; w < 4; w++) this.slab(w, -1, 1, Math.max(zA, zS), r1, 0, 0.055, T.light[2], lf * WALL[w], hz); }
         else if (it.pose) this.drawJumper(it.pose);
         else if (it.ax !== undefined) this.cube(it);
-        else this.box(it.w, it, zA, zB, lf * WALL[it.w], hz);
+        else {
+          const fade = clamp((this.boxFar - rel) / 1.4, 0, 1);
+          if (fade < 1) this.ctx.globalAlpha = fade;
+          this.box(it.w, it, zA, zB, lf * WALL[it.w], hz);
+          this.ctx.globalAlpha = 1;
+        }
       }
     }
 
@@ -1164,7 +1265,7 @@ a { color: inherit; }
       if (camU > a1) this.poly(w, [a1, d0, z0, a1, d1, z0, a1, d1, z1, a1, d0, z1], this.shade(col, f * 0.6, hz));
       this.poly(w, [a0, d0, z0, a1, d0, z0, a1, d1, z0, a0, d1, z0], this.shade(col, f * 0.4, hz));
       this.poly(w, [a0, d1, z0, a1, d1, z0, a1, d1, z1, a0, d1, z1], this.shade(col, f, hz));
-      if (hz > 0.45) return; // the rim of light is lost in the haze further out
+      if (hz > 0.45 || this.segRel > this.rimFar) return; // the rim of light is lost in the haze further out
       this.pt(w, a0, d1, z1); const x0 = this.px, y0 = this.py;
       this.pt(w, a1, d1, z1);
       ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(this.px, this.py);
@@ -1446,7 +1547,7 @@ a { color: inherit; }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       ctx.fillStyle = css(T.haze); ctx.fillRect(0, 0, w, h);
       const L = o.seg, zNear = cz + o.near;
-      const k0 = Math.floor(zNear / L), k1 = Math.floor((cz + o.far) / L);
+      const k0 = Math.floor(zNear / L), k1 = Math.floor((cz + (this.drawFar || o.far)) / L);
       const buckets = this.buckets; buckets.clear();
       const add = (z, item) => { const kk = Math.floor(z / L); let arr = buckets.get(kk); if (!arr) { arr = []; buckets.set(kk, arr); } arr.push(item); };
       for (const c of this.cubes) {
@@ -1529,6 +1630,7 @@ a { color: inherit; }
     loop(now) {
       if (!this.running) return;
       const t = frameTime(now), dt = frameDt(t, this.prev);
+      this.govern((t - this.prev) / 1000);
       this.prev = t;
       this.step(dt); this.draw();
       this.raf = requestAnimationFrame(this.loop);
@@ -1862,7 +1964,7 @@ a { color: inherit; }
     }
 
     resize() {
-      const r = this.canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = this.canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, COARSE ? 1.5 : 2);
       this.w = Math.max(1, r.width); this.h = Math.max(1, r.height);
       this.canvas.width = Math.round(this.w * dpr); this.canvas.height = Math.round(this.h * dpr);
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1913,7 +2015,7 @@ a { color: inherit; }
   const scenes = [];
 
   const heroCanvas = hero.querySelector('.corridor');
-  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: true, jumper: true, intro: motion });
+  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: false, jumper: true, intro: motion });
   if (motion) document.documentElement.classList.add('intro-pre');
   scenes.push({ el: heroCanvas, c: heroC, visible: true });
 
@@ -1926,8 +2028,9 @@ a { color: inherit; }
   let cubeVisible = false;
 
   function sync() {
+    const covered = document.documentElement.classList.contains('menu-open');
     for (const s of scenes) {
-      if (motion && s.visible && !document.hidden) s.c.start(); else s.c.stop();
+      if (motion && s.visible && !document.hidden && !covered) s.c.start(); else s.c.stop();
     }
     if (motion && cubeVisible && !document.hidden) startCube(); else stopCube();
   }
@@ -2030,6 +2133,65 @@ a { color: inherit; }
   }
   window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(applyScroll); } }, { passive: true });
 
+  /* ---------- Background field ----------
+     Each section under the cover gets the cube lattice and a few lit cubes on its sides (always in the same
+     places for a given layout), and the lattice drifts at a fraction of the scroll speed. */
+  (() => {
+    const LIT = '<svg viewBox="0 0 52 60" width="52" height="60"><path d="M26 0L52 15L26 30L0 15Z" fill-opacity=".42"/><path d="M0 15L26 30V60L0 45Z" fill-opacity=".24"/><path d="M26 30L52 15V45L26 60Z" fill-opacity=".12"/></svg>';
+    const fields = [...document.querySelectorAll('.section')].map((sec, si) => {
+      const f = document.createElement('div'), inner = document.createElement('div');
+      f.className = 'bg-field'; f.setAttribute('aria-hidden', 'true');
+      inner.className = 'bg-field-in';
+      f.append(inner); sec.prepend(f);
+      return { sec, inner, si, lit: [], w: 0, h: 0 };
+    });
+    function place(F) {
+      const W = F.sec.clientWidth, H = F.sec.clientHeight;
+      if (W === F.w && H === F.h) return;
+      F.w = W; F.h = H;
+      F.lit.forEach(n => n.remove()); F.lit = [];
+      let seed = (F.si + 1) * 7919;
+      const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+      const n = Math.max(2, Math.min(5, Math.round(H / 520))), zone = Math.max(60, W * 0.12);
+      for (let k = 0; k < n; k++) {
+        // lattice cells: centres at (i * 52 + (row odd ? 26 : 0), row * 45), the field starting 260px above the section
+        const row = Math.round((340 + rnd() * Math.max(0, H - 160)) / 45), off = row % 2 ? 26 : 0;
+        const x = k % 2 === 0 ? rnd() * zone : W - rnd() * zone, col = Math.round((x - off) / 52);
+        const el = document.createElement('div');
+        el.className = 'bg-lit';
+        el.style.left = (col * 52 + off - 26) + 'px';
+        el.style.top = (row * 45 - 30) + 'px';
+        el.style.animationDelay = (-rnd() * 9).toFixed(2) + 's';
+        el.innerHTML = LIT;
+        F.inner.append(el); F.lit.push(el);
+      }
+    }
+    // drifting is a desktop nicety; on phones the field stays still and costs nothing while scrolling
+    const canDrift = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    document.documentElement.classList.toggle('has-drift', canDrift);
+    let queued = false;
+    function drift() {
+      queued = false;
+      if (!canDrift) return;
+      const vh = window.innerHeight;
+      for (const F of fields) {
+        const r = F.sec.getBoundingClientRect();
+        if (r.bottom < -120 || r.top > vh + 120) continue;
+        const y = motion ? clamp(-(r.top + r.height / 2 - vh / 2) * 0.12, -230, 230) : 0;
+        F.inner.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)';
+      }
+    }
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(drift); } };
+    const sro = new ResizeObserver(entries => {
+      for (const e of entries) { const F = fields.find(x => x.sec === e.target); if (F) place(F); }
+      queue();
+    });
+    fields.forEach(F => { place(F); sro.observe(F.sec); });
+    window.addEventListener('scroll', queue, { passive: true });
+    reduceMQ.addEventListener('change', queue);
+    queue();
+  })();
+
   /* ---------- About cube ---------- */
   const cubeEl = cubeScene.querySelector('.cube');
   let rx = -22, ry = 38, drag = null, cubeRaf = 0, cubePrev = 0, cubeOn = false;
@@ -2068,7 +2230,7 @@ a { color: inherit; }
   const cursorDir = cursor.querySelector('.cursor-dir');
   const cursorCube = cursor.querySelector('.cursor-cube');
   const UNIT = 22, TILT_MAX = 22;
-  const DOCK = '.menu-btn, .menu-list a, .links a, .turn, .scroll-cue, .tile-link, .row-link, .cred-link';
+  const DOCK = '.menu-btn, .menu-list a, .links a, .turn, .soc, .scroll-cue, .tile-link, .row-link, .cred-link';
   const BACK = '.cover, .skill';
   const C = {
     tx: 0, ty: 0, x: 0, y: 0, px: 0, py: 0,
@@ -2233,6 +2395,7 @@ a { color: inherit; }
     menuLabel.textContent = open ? 'Close' : 'Menu';
     mainEl.inert = open;
     root.style.overflow = open ? 'hidden' : '';
+    sync();
     if (C.on) updateZone();
     if (open) { const first = menu.querySelector('a'); if (first) setTimeout(() => first.focus({ preventScroll: true }), 60); }
     else if (restoreFocus) menuBtn.focus({ preventScroll: true });
@@ -2255,7 +2418,6 @@ a { color: inherit; }
     hudOff = off;
     document.documentElement.classList.toggle('hud-off', off);
     hudStatus.textContent = off ? 'Interface hidden. Click the corridor, or press H or Escape, to show it again.' : 'Interface shown.';
-    heroC.o.vignette = !off; // with nothing to read on top, show the corridor edge to edge
     if (!heroC.running) heroC.draw();
     if (off && how === 'button') hero.focus({ preventScroll: true });
     if (!off && how === 'key') hudBtn.focus({ preventScroll: true });
@@ -2305,7 +2467,7 @@ a { color: inherit; }
   let opened = false;
   function endOpening() {
     opened = true;
-    document.documentElement.classList.remove('intro-pre', 'name-in', 'bars-out', 'ui-in');
+    document.documentElement.classList.remove('intro-pre', 'name-in', 'bars-out', 'ui-in', 'intro-fast');
   }
   function playOpening() {
     if (opened) return;
@@ -2324,8 +2486,8 @@ a { color: inherit; }
     function onScroll() {
       if (window.scrollY < 40) return;
       timers.forEach(clearTimeout);
-      html.classList.add('name-in', 'bars-out', 'ui-in');
-      setTimeout(finish, 1500);
+      html.classList.add('intro-fast', 'name-in', 'bars-out', 'ui-in');
+      setTimeout(finish, 800);
       window.removeEventListener('scroll', onScroll);
     }
     function finish() { window.removeEventListener('scroll', onScroll); endOpening(); }
