@@ -234,6 +234,24 @@ a { color: inherit; }
   transition: opacity .4s, visibility 0s linear .4s;
 }
 
+/* Opening shot: film bars, the name letter by letter from the middle out, then the interface */
+.hero-fit .w { white-space: nowrap; }
+.hero-fit .ch { display: inline-block; }
+.cine-bars { display: none; }
+.intro-pre .cine-bars { display: block; position: fixed; inset: 0; z-index: 41; pointer-events: none; }
+.cine-bars i { position: absolute; left: 0; right: 0; height: 9vh; background: var(--void); transition: transform 1.8s cubic-bezier(.65, 0, .35, 1); }
+.cine-bars i:first-child { top: 0; transform-origin: 50% 0; }
+.cine-bars i:last-child { bottom: 0; transform-origin: 50% 100%; }
+.bars-out .cine-bars i { transform: scaleY(0); }
+.intro-pre .hero-fit .ch { opacity: 0; transform: translateY(.38em) scale(1.08); filter: blur(14px); }
+.intro-pre.name-in .hero-fit .ch {
+  opacity: 1; transform: none; filter: blur(0);
+  transition: opacity 1.6s cubic-bezier(.22, 1, .36, 1) var(--d), transform 2.4s cubic-bezier(.22, 1, .36, 1) var(--d), filter 1.9s cubic-bezier(.22, 1, .36, 1) var(--d);
+}
+.intro-pre .site-head, .intro-pre .scroll-cue { opacity: 0; pointer-events: none; }
+.intro-pre.ui-in .site-head, .intro-pre.ui-in .scroll-cue { opacity: 1; pointer-events: auto; transition: opacity 1.4s ease; }
+.intro-pre.ui-in .site-head { pointer-events: none; }
+
 /* Loading screen: eight blocks that come apart and lock back into a cube */
 .loader { display: none; }
 .js .loader {
@@ -509,6 +527,7 @@ a { color: inherit; }
 </style>
 </head>
 <body>
+<div class="cine-bars" aria-hidden="true"><i></i><i></i></div>
 <div class="loader" role="status">
   <div class="loader-scene" aria-hidden="true"><div class="loader-cube"><span class="lc" style="--x:-1;--y:-1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:-1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:-1;--y:1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:-1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc hot" style="--x:1;--y:-1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:1;--z:-1"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="lc" style="--x:1;--y:1;--z:1"><i></i><i></i><i></i><i></i><i></i><i></i></span></div></div>
   <p class="loader-text">Loading</p>
@@ -784,6 +803,9 @@ a { color: inherit; }
   const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
   const hits = (A, B) => A[0] < B[1] && A[1] > B[0] && A[2] < B[3] && A[3] > B[2] && A[4] < B[5] && A[5] > B[4];
   const TAU = Math.PI * 2;
+  // Opening shot, in seconds from the moment the loading screen lifts
+  const INTRO = { dolly: 5.6, back: 1.8, light: 0.55, reveal: 3.0, pop: 2.6, end: 6.2 };
+  const CHIPS = ['#FF6A2B', '#E9E4D8', '#7F9BB5'];
   // Some hosts call animation frames without a timestamp (or with a different clock).
   // Normalise it so a missing value can never turn the scene state into NaN.
   const frameTime = now => (Number.isFinite(now) ? now : performance.now());
@@ -823,7 +845,7 @@ a { color: inherit; }
         seg: 0.34, near: 0.05, far: 16, fov: 0.62, vp: [0.5, 0.5],
         accentP: 0.1, patternP: 0.3, boxP: 0.52, cubes: 22, ribEvery: 7,
         glowSize: 0.5, roll: 0, speed: 0.38, seed: 1, scrollDepth: 3.5,
-        lightNear: 0.36, vignette: false, jumper: false,
+        lightNear: 0.36, vignette: false, jumper: false, intro: false,
       }, opts);
       const o = this.o, T = this.t = {};
       for (const k of ['dark', 'light', 'accent', 'box', 'cube', 'wire']) T[k] = THEME[k].map(hex);
@@ -853,11 +875,22 @@ a { color: inherit; }
       this.X = new Float64Array(8); this.Y = new Float64Array(8); this.Z = new Float64Array(8);
       this.SX = new Float64Array(8); this.SY = new Float64Array(8);
       this.buckets = new Map(); this.items = [];
-      this.j = { mode: 'idle', from: null, to: null, s: 0, dur: 0.6, wait: 0, blink: 2, flip: 0 };
+      this.j = { mode: o.intro ? 'hold' : 'idle', from: null, to: null, s: 0, dur: 0.6, wait: 0, blink: 2, flip: 0 };
+      this.introT = o.intro ? -1 : 99; // -1 waits in the dark behind the loading screen
       this.running = false; this.raf = 0; this.prev = 0;
       this.loop = this.loop.bind(this);
       this.resize();
       if (o.jumper) { this.updateJumper(0); this.draw(); }
+    }
+
+    playIntro() { this.introT = 0; this.j.mode = 'hold'; }
+    skipIntro() { this.introT = 99; if (this.j.mode === 'hold') this.j.mode = 'idle'; if (!this.running) this.draw(); }
+    // The opening push-in: the camera starts a little way back and glides forward, slowing to its usual pace.
+    introZ() {
+      const t = this.introT;
+      if (t >= INTRO.dolly) return 0;
+      const e = t <= 0 ? 0 : 0.5 - 0.5 * Math.cos((Math.PI * t) / INTRO.dolly);
+      return -INTRO.back * (1 - e);
     }
 
     // Brightness from the light at the far end, and the warm haze that swallows distant tiles.
@@ -894,6 +927,7 @@ a { color: inherit; }
       this.cx += (this.tx - this.cx) * k; this.cy += (this.ty - this.cy) * k;
       this.vx += (this.tvx - this.vx) * k; this.vy += (this.tvy - this.vy) * k;
       this.camZ += this.o.speed * dt;
+      if (this.introT >= 0 && this.introT < 99) { this.introT += dt; if (this.introT > INTRO.end) this.introT = 99; }
       if (this.o.jumper) this.updateJumper(dt);
     }
 
@@ -1113,6 +1147,8 @@ a { color: inherit; }
     /* ---- The jumper: a small cube creature hopping between wall boxes.
        Its "down" is whichever wall it stands on, so it walks the ceiling too. ---- */
     anchor(ref) {
+      // floats along just ahead of the camera until it leaps, then that spot stays put
+      if (ref.center) return { x: 0, y: 0.16, z: ref.rel != null ? this.cz + ref.rel : ref.z, nx: 0, ny: -1 };
       const b = this.boxAt(ref.k, ref.w, ref.i, ref.m);
       if (!b) return null;
       const p = this.wallXY(ref.w, b.uc, b.d + (b.st ? b.st.dd : 0)); // stand on the stacked block if there is one
@@ -1201,9 +1237,19 @@ a { color: inherit; }
 
     updateJumper(dt) {
       const J = this.j;
-      this.cz = this.camZ + this.scrollZ;
+      this.cz = this.camZ + this.scrollZ + this.introZ();
       J.blink -= dt;
       if (J.blink < -0.12) J.blink = 2 + Math.random() * 3;
+      if (J.mode === 'hold') {
+        // it pops into being in the middle of the corridor, just as the light comes up
+        if (this.introT >= INTRO.pop) { J.from = { center: true, rel: 1.8, z: 0 }; J.mode = 'pop'; J.s = 0; }
+        return;
+      }
+      if (J.mode === 'pop') {
+        J.s += dt / 0.8;
+        if (J.s >= 1) { J.mode = 'stand'; J.wait = 1.3; J.blink = 2.5; }
+        return;
+      }
       if (J.mode === 'idle') {
         const r = this.pickBox(2.2, 4.6);
         if (r) { J.from = r; J.mode = 'stand'; J.wait = 0.6 + Math.random(); }
@@ -1215,7 +1261,7 @@ a { color: inherit; }
         if (rel < 0.7) { J.mode = 'idle'; return; }
         J.wait -= dt;
         // Hop only a little way ahead, so on average it keeps pace with the camera instead of racing it.
-        if (J.wait <= 0 || rel < 1.9) {
+        if (J.wait <= 0 || (!J.from.center && rel < 1.9)) {
           const lo = Math.max(rel + 0.3, 2.3);
           const r = this.pickBox(lo, lo + 1.3, J.from.w, J.from);
           if (r) { J.to = r; J.mode = 'crouch'; J.s = 0; } else J.wait = 0.4;
@@ -1223,6 +1269,7 @@ a { color: inherit; }
       } else if (J.mode === 'crouch') {
         J.s += dt / 0.24;
         if (J.s >= 1) {
+          if (J.from.center && J.from.rel != null) { J.from.z = this.cz + J.from.rel; J.from.rel = null; }
           const b = this.anchor(J.to);
           J.dur = 1.0 + Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * 0.22;
           J.flip = J.from.w === J.to.w && Math.random() < 0.25 ? (Math.random() < 0.5 ? -1 : 1) : 0;
@@ -1241,12 +1288,18 @@ a { color: inherit; }
 
     jumperPose() {
       const J = this.j;
-      if (J.mode === 'idle' || !J.from) return null;
+      if (J.mode === 'idle' || J.mode === 'hold' || !J.from) return null;
       const a = this.anchor(J.from);
       const ang0 = Math.atan2(a.ny, a.nx);
+      if (J.mode === 'pop') {
+        // springs up from nothing, overshoots a touch and settles
+        const s = J.s, c = 2.2, e = 1 + (c + 1) * Math.pow(s - 1, 3) + c * Math.pow(s - 1, 2);
+        return { x: a.x, y: a.y, z: a.z, ang: ang0, sq: 1, air: true, scale: Math.max(0, e), pop: s };
+      }
       if (J.mode !== 'jump') {
         const sq = J.mode === 'crouch' ? 1 - 0.3 * J.s : J.mode === 'land' ? 0.76 + 0.24 * J.s : 1 + 0.03 * Math.sin(this.time / 260);
-        return { x: a.x, y: a.y, z: a.z, ang: ang0, sq, air: false };
+        const bob = J.from.center ? Math.sin(this.time / 420) * 0.012 : 0;
+        return { x: a.x, y: a.y + bob, z: a.z, ang: ang0, sq, air: !!J.from.center };
       }
       const b = this.anchor(J.to), s = J.s, q = 1 - s;
       const p = this.arcPoint(a, b, J.from.w === J.to.w, s);
@@ -1261,21 +1314,23 @@ a { color: inherit; }
       };
     }
 
-    drawJumper(P) {
+    drawJumper(P, alpha = 1) {
       const rel = P.z - this.cz;
-      if (rel < this.o.near * 6) return;
-      const ctx = this.ctx, T = this.t;
+      if (rel < this.o.near * 6 || alpha <= 0.001) return;
+      const ctx = this.ctx, T = this.t, sc = P.scale == null ? 1 : P.scale;
       const lf = Math.max(0.75, this.lightAt(rel)), hz = this.hazeAt(rel) * 0.6;
       this.proj(P.x, P.y, P.z);
       const sx = this.px, sy = this.py;
       this.proj(P.x + Math.cos(P.ang) * 0.05, P.y + Math.sin(P.ang) * 0.05, P.z);
       const rot = Math.atan2(this.px - sx, -(this.py - sy));
-      const S = (this.f * 0.17) / rel;
+      const S0 = (this.f * 0.17) / rel, S = S0 * sc;
       const bw = S * (1 + (1 - P.sq) * 0.5), bh = S * P.sq * 0.86;
       const legH = S * (P.air ? 0.1 : 0.2 * P.sq), legW = S * 0.17;
       const body = css(this.shade(T.char[0], lf, hz)), line = css(T.char[1]), eye = css(T.char[2]);
       ctx.save();
       ctx.translate(sx, sy); ctx.rotate(rot);
+      if (P.pop != null && P.pop < 1) this.popFx(P.pop, S0, -S0 * 0.52, alpha);
+      ctx.globalAlpha = alpha;
       ctx.fillStyle = line;
       ctx.fillRect(-bw * 0.27 - legW / 2, -legH - 1, legW, legH + 1);
       ctx.fillRect(bw * 0.27 - legW / 2, -legH - 1, legW, legH + 1);
@@ -1287,18 +1342,36 @@ a { color: inherit; }
       const c = Math.cos(-rot), sn = Math.sin(-rot);
       const es = Math.max(1.5, bw * 0.16);
       const lx = ((dx * c - dy * sn) / dl) * es * 0.4, ly = ((dx * sn + dy * c) / dl) * es * 0.4;
-      const eh = this.j.blink < 0 ? es * 0.2 : es, ey = top + bh * 0.4;
+      const shut = this.j.blink < 0 || (P.pop != null && P.pop < 0.7);
+      const eh = shut ? es * 0.2 : es, ey = top + bh * 0.4;
       ctx.fillStyle = eye;
       ctx.fillRect(-bw * 0.2 - es / 2 + lx, ey - eh / 2 + ly, es, eh);
       ctx.fillRect(bw * 0.2 - es / 2 + lx, ey - eh / 2 + ly, es, eh);
       ctx.restore();
     }
 
+    // The pop: a square ring opens out and a few chips fly off, gone within half a second.
+    popFx(s, S, cy, alpha) {
+      const ctx = this.ctx, e = 1 - Math.pow(1 - s, 3), fade = (1 - s) * alpha;
+      const r = S * (0.5 + 2.4 * e);
+      ctx.globalAlpha = fade * 0.85;
+      ctx.strokeStyle = CHIPS[1]; ctx.lineWidth = Math.max(1, S * 0.06 * (1 - s));
+      ctx.strokeRect(-r, cy - r, r * 2, r * 2);
+      for (let i = 0; i < 8; i++) {
+        const ang = (i * TAU) / 8 + 0.39, d = S * (0.45 + 2.1 * e), q = S * 0.15 * (1 - 0.6 * s);
+        ctx.globalAlpha = fade;
+        ctx.fillStyle = CHIPS[i % 3];
+        ctx.fillRect(Math.cos(ang) * d - q / 2, cy + Math.sin(ang) * d - q / 2, q, q);
+      }
+      ctx.globalAlpha = 1;
+    }
+
     draw() {
       const o = this.o, ctx = this.ctx, w = this.w, h = this.h, T = this.t;
       if (!w || !h) return;
       this.sane();
-      const cz = this.cz = this.camZ + this.scrollZ;
+      if (this.introT < 0) { ctx.globalAlpha = 1; ctx.fillStyle = '#05070A'; ctx.fillRect(0, 0, w, h); return; }
+      const cz = this.cz = this.camZ + this.scrollZ + this.introZ();
       this.cr = Math.cos(o.roll); this.sr = Math.sin(o.roll);
       this.ox = w * o.vp[0] + this.vx * w; this.oy = h * o.vp[1] + this.vy * h;
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
@@ -1319,12 +1392,35 @@ a { color: inherit; }
         if (zA < zNear) zA = zNear;
         this.segment(k, zA, zB, (zA + zB) / 2 - cz, buckets.get(k));
       }
-      this.glow();
+      const it = this.introT;
+      if (it < INTRO.reveal + 0.3) this.reveal(it);
+      // the far light swells up out of the dark and flares once as the jumper appears
+      this.glow(it >= 99 ? 1 : 0.05 + 0.95 * smooth((it - INTRO.light) / 2.2) + 0.22 * Math.exp(-Math.pow((it - INTRO.pop - 0.12) / 0.38, 2)));
+      // in the middle of the corridor it stands in front of the light, so it is drawn over the glow
+      if (pose && this.j.from && this.j.from.center) {
+        const J = this.j, a = J.mode === 'jump' ? 1 - smooth(J.s / 0.6) : 1;
+        this.drawJumper(pose, a);
+      }
       if (o.vignette) this.vignette();
     }
 
-    glow() {
-      const ctx = this.ctx, o = this.o, R = Math.min(this.w, this.h) * o.glowSize;
+    // Darkness drawn back from the light at the far end, so the corridor lights up toward the camera.
+    reveal(t) {
+      const ctx = this.ctx, w = this.w, h = this.h;
+      const p = smooth((t - INTRO.light - 0.2) / INTRO.reveal);
+      if (p >= 1 || !Number.isFinite(this.ox)) return;
+      const R = 1 + p * Math.hypot(w, h) * 1.25;
+      const g = ctx.createRadialGradient(this.ox, this.oy, 0, this.ox, this.oy, R);
+      g.addColorStop(0, 'rgba(5,7,10,' + (0.7 * (1 - p)).toFixed(3) + ')');
+      g.addColorStop(0.5, 'rgba(5,7,10,' + (0.85 * (1 - p)).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(5,7,10,1)');
+      ctx.globalAlpha = 1 - smooth((p - 0.55) / 0.45);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1;
+    }
+
+    glow(scale = 1) {
+      const ctx = this.ctx, o = this.o, R = Math.min(this.w, this.h) * o.glowSize * scale;
       if (!Number.isFinite(this.ox) || !Number.isFinite(this.oy) || !(R > 0)) return;
       const g = ctx.createRadialGradient(this.ox, this.oy, 0, this.ox, this.oy, R);
       g.addColorStop(0, 'rgba(' + THEME.glowCore + ',.95)');
@@ -1748,7 +1844,8 @@ a { color: inherit; }
   const scenes = [];
 
   const heroCanvas = hero.querySelector('.corridor');
-  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: true, jumper: true });
+  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: true, jumper: true, intro: motion });
+  if (motion) document.documentElement.classList.add('intro-pre');
   scenes.push({ el: heroCanvas, c: heroC, visible: true });
 
   const cityEl = document.querySelector('.city');
@@ -1816,6 +1913,30 @@ a { color: inherit; }
 
   /* The name runs edge to edge on one line on wider screens */
   const heroFit = heroName.querySelector('.hero-fit');
+  // split into letters for the opening reveal; screen readers get the plain name
+  (() => {
+    const text = heroFit.textContent, chunks = text.split(' ');
+    const total = text.replace(/[\s\u00a0]/g, '').length, mid = (total - 1) / 2;
+    let n = 0;
+    const sr = document.createElement('span');
+    sr.className = 'sr-only'; sr.textContent = text.replace(/\u00a0/g, ' ');
+    heroFit.textContent = '';
+    heroFit.setAttribute('aria-hidden', 'true');
+    chunks.forEach((chunk, ci) => {
+      if (ci) heroFit.append(' ');
+      const w = document.createElement('span');
+      w.className = 'w';
+      for (const c of chunk) {
+        if (c === '\u00a0') { w.append('\u00a0'); continue; }
+        const ch = document.createElement('span');
+        ch.className = 'ch'; ch.textContent = c;
+        ch.style.setProperty('--d', (Math.abs(n - mid) / mid * 0.9).toFixed(3) + 's');
+        w.append(ch); n++;
+      }
+      heroFit.append(w);
+    });
+    heroName.insertBefore(sr, heroFit);
+  })();
   function fitName() {
     if (window.innerWidth <= 520) { heroName.style.fontSize = ''; return; }
     heroName.style.fontSize = '100px';
@@ -2104,9 +2225,45 @@ a { color: inherit; }
         html.classList.remove('is-loading');
         loader.setAttribute('aria-hidden', 'true');
         setTimeout(() => loader.remove(), 700);
+        playOpening();
       }, Math.max(0, 650 - (performance.now() - started)));
     });
   })();
+
+  /* ---------- Opening shot ----------
+     Light comes up from the far end while the camera glides in, the jumper pops into the middle,
+     the name resolves letter by letter from the centre, the film bars open, then the interface. */
+  let opened = false;
+  function endOpening() {
+    opened = true;
+    document.documentElement.classList.remove('intro-pre', 'name-in', 'bars-out', 'ui-in');
+  }
+  function playOpening() {
+    if (opened) return;
+    opened = true;
+    const html = document.documentElement;
+    if (!motion || !html.classList.contains('intro-pre') || window.scrollY > hero.offsetHeight * 0.3) {
+      heroC.skipIntro(); endOpening(); return;
+    }
+    heroC.playIntro();
+    const timers = [], at = (ms, fn) => timers.push(setTimeout(fn, ms));
+    at(3500, () => html.classList.add('name-in'));
+    at(5600, () => html.classList.add('bars-out'));
+    at(6300, () => html.classList.add('ui-in'));
+    at(8200, finish);
+    // scrolling on wraps the opening up at once, so the menu is never missing further down
+    function onScroll() {
+      if (window.scrollY < 40) return;
+      timers.forEach(clearTimeout);
+      html.classList.add('name-in', 'bars-out', 'ui-in');
+      setTimeout(finish, 1500);
+      window.removeEventListener('scroll', onScroll);
+    }
+    function finish() { window.removeEventListener('scroll', onScroll); endOpening(); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+  // if anything holds the loading screen up for too long, never leave the hero dark
+  setTimeout(() => { if (!opened) { heroC.skipIntro(); endOpening(); } }, 9000);
 
   /* ---------- Motion follows the system's reduced-motion setting ---------- */
   function setMotion(on) { motion = on; sync(); }
