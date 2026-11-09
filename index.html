@@ -183,7 +183,7 @@ a { color: inherit; }
 /* darkens the top and bottom so the header and the name stay readable; a static layer, so it costs nothing per frame */
 .hero::after {
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, .85), rgba(0, 0, 0, .6) 7.5%, transparent 17%, transparent 50%, rgba(0, 0, 0, .45) 75%, rgba(0, 0, 0, .8));
+  background: linear-gradient(180deg, rgba(0, 0, 0, .85), rgba(0, 0, 0, .6) 7.5%, transparent 17%, transparent 50%, rgba(0, 0, 0, .45) 75%, rgba(3, 4, 6, .82) 92%, var(--void));
   transition: opacity .4s;
 }
 .hud-off .hero::after { opacity: 0; }
@@ -300,7 +300,7 @@ a { color: inherit; }
 
 /* Sections */
 .section { padding: clamp(80px, 11vw, 150px) 0; }
-.section.alt { background: var(--bg-2); }
+.section.alt { background: var(--bg); }
 .sec-head {
   display: grid; grid-template-columns: minmax(0, 1fr);
   gap: 16px 48px; align-items: end;
@@ -324,11 +324,23 @@ a { color: inherit; }
 .section { position: relative; }
 .section > .wrap { position: relative; }
 .section { --veil: rgba(10, 13, 18, .75); }
-.section.alt { --veil: rgba(16, 21, 28, .75); }
+.section.alt { --veil: rgba(10, 13, 18, .75); }
 .section.contact { --veil: rgba(5, 7, 10, .75); }
 .bg-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-/* thinner behind the text: a veil in the section's own colour over the middle (cheaper than a mask) */
-.bg-field::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--veil) 26%, var(--veil) 74%, transparent); }
+/* Lighting, top layer first: each section fades up from black and back down to it, so sections meet in a dip
+   to black like cuts between shots; a warm key light (the corridor's colour) spills in from a top corner, on
+   alternate sides from one section to the next, with a cool fill low on the other side; and a veil in the
+   section's own colour thins the cube field behind the text. */
+.bg-field { --key-x: 86%; }
+.section:nth-of-type(odd) .bg-field { --key-x: 14%; }
+.bg-field::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, var(--void), rgba(5, 7, 10, 0) 170px, rgba(5, 7, 10, 0) calc(100% - 170px), var(--void)),
+    radial-gradient(ellipse 62% 640px at var(--key-x) 0, rgba(255, 122, 60, .085), rgba(255, 122, 60, 0) 72%),
+    radial-gradient(ellipse 50% 520px at calc(100% - var(--key-x)) 100%, rgba(127, 155, 181, .05), rgba(127, 155, 181, 0) 72%),
+    linear-gradient(90deg, transparent, var(--veil) 26%, var(--veil) 74%, transparent);
+}
 .bg-field-in {
   position: absolute; left: 0; right: 0; top: -260px; bottom: -260px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath fill='%23E9E4D8' fill-opacity='.03' d='M0 -30L26 -15L0 0L-26 -15ZM52 -30L78 -15L52 0L26 -15ZM26 15L52 30L26 45L0 30ZM0 60L26 75L0 90L-26 75ZM52 60L78 75L52 90L26 75Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.016' d='M-26 -15L0 0L0 30L-26 15ZM26 -15L52 0L52 30L26 15ZM0 30L26 45L26 75L0 60ZM-26 75L0 90L0 120L-26 105ZM26 75L52 90L52 120L26 105Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.006' d='M0 0L26 -15L26 15L0 30ZM52 0L78 -15L78 15L52 30ZM26 45L52 30L52 60L26 75ZM0 90L26 75L26 105L0 120ZM52 90L78 75L78 105L52 120Z'/%3E%3C/svg%3E") 0 0 / 52px 90px;
@@ -373,6 +385,41 @@ a { color: inherit; }
   .xp-time { grid-column: 2; grid-row: 1; text-align: left; padding-top: 4px; margin-bottom: 6px; }
   .xp-node { grid-column: 1; grid-row: 1 / span 2; }
   .xp-body { grid-column: 2; grid-row: 2; }
+}
+
+/* Section entrances: a block pops up beside a heading, stretches across it, uncovers the words as it slides
+   off, folds back into a block and vanishes. Then the rule under the heading draws in and the content rises.
+   Only with JS and motion on; otherwise everything is simply there. */
+.rv { position: relative; display: inline-block; max-width: 100%; }
+.rv-block { display: none; }
+.reveal-on .rv-block {
+  display: block; position: absolute; top: 0; bottom: 0; left: -.04em; right: -.04em;
+  background: var(--accent); pointer-events: none;
+  transform-origin: 0 50%; transform: scale(0, 0);
+}
+.reveal-on .rv-text { opacity: 0; }
+.reveal-on .rv.in .rv-block { animation: rv-block 1.2s both; }
+.reveal-on .rv.in .rv-text { animation: rv-text 1.2s linear both; }
+@keyframes rv-block {
+  0% { transform: translateX(calc(var(--sq) * 50%)) scale(0, 0); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+  17% { transform: translateX(0) scale(var(--sq), 1); }
+  25% { transform: translateX(0) scale(var(--sq), 1); animation-timing-function: cubic-bezier(.65, 0, .35, 1); }
+  50% { transform: translateX(0) scale(1, 1); }
+  57% { transform: translateX(0) scale(1, 1); animation-timing-function: cubic-bezier(.65, 0, .35, 1); }
+  83% { transform: translateX(calc((1 - var(--sq)) * 100%)) scale(var(--sq), 1); animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+  100% { transform: translateX(calc((1 - var(--sq) / 2) * 100%)) scale(0, 0); }
+}
+@keyframes rv-text { 0%, 53% { opacity: 0; } 54%, 100% { opacity: 1; } }
+.reveal-on .sec-head { position: relative; border-bottom-color: transparent; }
+.reveal-on .sec-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: var(--text);
+  transform: scaleX(0); transform-origin: 0 50%;
+}
+.reveal-on .sec-head.in::after { transform: none; transition: transform 1s cubic-bezier(.65, 0, .35, 1) .62s; }
+.reveal-on .rv-up { opacity: 0; transform: translateY(var(--rv-y, 24px)); }
+.reveal-on .rv-up.in {
+  opacity: 1; transform: none;
+  transition: opacity .8s cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0s), transform 1.1s cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0s);
 }
 
 /* Work tiles */
@@ -2130,6 +2177,7 @@ a { color: inherit; }
     heroC.scroll(p);
     heroName.style.transform = 'scale(' + (1 + p * 0.45).toFixed(4) + ')';
     heroName.style.opacity = String(clamp(1 - p * 1.6, 0, 1));
+    heroCanvas.style.opacity = String(clamp(1 - p * 0.95, 0.05, 1).toFixed(3));
   }
   window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(applyScroll); } }, { passive: true });
 
@@ -2190,6 +2238,76 @@ a { color: inherit; }
     window.addEventListener('scroll', queue, { passive: true });
     reduceMQ.addEventListener('change', queue);
     queue();
+  })();
+
+  /* ---------- Section entrances ----------
+     Headings get the block that pops, stretches, uncovers the words and folds away; content rises in order,
+     a beat after its heading when they arrive together. Anything that leaves the screen entirely resets, so
+     scrolling back plays it again; content then comes down from above, the way you are travelling. */
+  (() => {
+    if (!motion || !('IntersectionObserver' in window)) return;
+    const html = document.documentElement;
+    html.classList.add('reveal-on');
+    // if reduced motion is switched on later, just show whatever hasn't played yet
+    reduceMQ.addEventListener('change', e => { if (e.matches) html.classList.remove('reveal-on'); });
+    for (const h of document.querySelectorAll('.section .sec-head h2, .section .sub-h')) {
+      const rv = document.createElement('span'), txt = document.createElement('span'), blk = document.createElement('span');
+      rv.className = 'rv'; txt.className = 'rv-text'; blk.className = 'rv-block';
+      blk.setAttribute('aria-hidden', 'true');
+      while (h.firstChild) txt.append(h.firstChild);
+      rv.append(txt, blk); h.append(rv);
+    }
+    const ups = [...document.querySelectorAll('.about-grid > *, .xp-item, .work .tile, .rows li, .legend, .skill-group, .cred-list li, .links li, .city-wrap')];
+    ups.forEach(el => el.classList.add('rv-up'));
+    let lastHead = -1e9;
+    const shown = new Set();
+    const io = new IntersectionObserver(entries => {
+      const now = performance.now();
+      const hits = entries.filter(e => e.isIntersecting && !shown.has(e.target)).map(e => e.target)
+        .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+      let n = 0;
+      for (const el of hits) {
+        shown.add(el);
+        if (el.classList.contains('rv')) {
+          const r = el.getBoundingClientRect();
+          el.style.setProperty('--sq', Math.min(1, r.height / Math.max(1, r.width)).toFixed(4));
+          el.classList.add('in'); lastHead = now;
+          const head = el.closest('.sec-head');
+          if (head) head.classList.add('in');
+          continue;
+        }
+        const base = now - lastHead < 450 ? 0.4 : 0;
+        el.style.setProperty('--rv-d', (base + Math.min(n++, 6) * 0.08).toFixed(2) + 's');
+        el.classList.add('in');
+        // once it has landed, drop the reveal styles so nothing lingers on the element
+        el.addEventListener('transitionend', function done(e) {
+          if (e.target !== el || e.propertyName !== 'transform') return;
+          el.removeEventListener('transitionend', done);
+          el.classList.remove('rv-up', 'in');
+          el.style.removeProperty('--rv-d');
+        });
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    // once something is fully off screen (with a margin, so nothing flickers at the edge), set it back
+    const away = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        const el = e.target;
+        if (e.isIntersecting || !shown.has(el)) continue;
+        shown.delete(el);
+        if (el.classList.contains('rv')) {
+          el.classList.remove('in');
+          const head = el.closest('.sec-head');
+          if (head) head.classList.remove('in');
+        } else {
+          // it comes back from the side it left by
+          el.style.setProperty('--rv-y', e.boundingClientRect.bottom < 0 ? '-24px' : '24px');
+          el.style.removeProperty('--rv-d');
+          el.classList.remove('in');
+          el.classList.add('rv-up');
+        }
+      }
+    }, { threshold: 0, rootMargin: '80px 0px 80px 0px' });
+    for (const el of [...document.querySelectorAll('.rv'), ...ups]) { io.observe(el); away.observe(el); }
   })();
 
   /* ---------- About cube ---------- */
