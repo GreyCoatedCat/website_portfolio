@@ -97,7 +97,7 @@
   position: fixed; inset: 0; z-index: 80;
   display: grid; place-content: center; justify-items: center; gap: 30px;
   background: var(--void);
-  transition: opacity .55s ease, visibility 0s linear .55s;
+  transition: opacity .9s ease, visibility 0s linear .9s;
   animation: loader-failsafe .5s ease 8s forwards;
 }
 .is-loaded .loader { opacity: 0; visibility: hidden; }

@@ -7,7 +7,7 @@
   const COARSE = Portfolio.COARSE;
 
   // Opening shot, in seconds from the moment the loading screen lifts
-  const INTRO = { dolly: 5.6, back: 1.8, light: 0.55, reveal: 3.0, pop: 2.6, end: 6.2 };
+  const INTRO = { dolly: 5.6, back: 1.8, light: 0.12, reveal: 3.2, pop: 2.6, end: 6.2 };
   const CHIPS = ['#FF6A2B', '#E9E4D8', '#7F9BB5'];
 
 
@@ -42,7 +42,7 @@
       const o = this.o, T = this.t = {};
       // quality: 0 full, 1 lighter, 2 lightest. Phones start at 1; any device steps down if frames run long.
       this.q = -1; this.slowFor = 0; this.ema = 1 / 60;
-      this.setQuality(COARSE || window.innerWidth < 700 ? 1 : 0, true);
+      this.setQuality(COARSE || window.innerWidth < 700 ? 1 : 0);
       for (const k of ['dark', 'light', 'accent', 'box', 'cube', 'wire']) T[k] = THEME[k].map(hex);
       T.lo = hex(THEME.lo); T.hi = hex(THEME.hi); T.haze = hex(THEME.haze);
       T.char = THEME.char.map(hex);
@@ -78,11 +78,12 @@
       if (o.jumper) { this.updateJumper(0); this.draw(); }
     }
 
-    setQuality(q, initial) {
+    // Detail levels only. The canvas resolution is never changed here: resizing a canvas blanks it, and on some
+    // machines that blank frame reaches the screen as a black flash.
+    setQuality(q) {
       if (q === this.q) return;
       this.q = q;
       const far = this.o.far;
-      this.dprCap = [1.75, 1.25, 1][q];
       this.boxFar = far * [0.75, 0.55, 0.42][q];  // blocks further out than this are left to the haze (they fade in)
       this.mergeFar = [99, 7, 5][q];              // past this a wall slice is one plain plane plus its accent tiles
       this.shadowFar = [99, 7, 5][q];
@@ -90,7 +91,6 @@
       this.seamFar = [8, 5, 0][q];
       this.rimFar = [99, 6, 3.5][q];               // the bright top edge on blocks
       this.drawFar = far * [1, 0.85, 0.75][q];     // the last stretch is almost pure haze under the glow
-      if (!initial) this.resize();
     }
     // Watches real frame times; if the scene keeps running under ~40fps it drops a quality step (never back up).
     govern(raw) {
@@ -117,8 +117,13 @@
 
     resize() {
       const r = this.canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, this.dprCap || 1.75);
       this.w = Math.max(1, r.width); this.h = Math.max(1, r.height);
+      // Sharp enough for the screen, within a pixel budget the scene can fill every frame: up to 1.5x on desktops
+      // (1.25x on phones) and no more than about 3.2 million canvas pixels.
+      const cap = COARSE || this.w < 700 ? 1.25 : 1.5;
+      const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, cap, Math.sqrt(3.2e6 / (this.w * this.h))));
+      if (this.canvas.width === Math.round(this.w * dpr) && this.canvas.height === Math.round(this.h * dpr) && this.dpr === dpr) { this.draw(); return; }
+      this.dpr = dpr;
       this.canvas.width = Math.round(this.w * dpr); this.canvas.height = Math.round(this.h * dpr);
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       this.f = Math.min(this.w, this.h) * this.o.fov;

@@ -253,7 +253,7 @@
         html.classList.add('is-loaded');
         html.classList.remove('is-loading');
         loader.setAttribute('aria-hidden', 'true');
-        setTimeout(() => loader.remove(), 700);
+        setTimeout(() => loader.remove(), 1000);
         playOpening();
       }, Math.max(0, 650 - (performance.now() - started)));
     });
