@@ -1,0 +1,115 @@
+/* Fixed interface: header, menu overlay and the cursor cube. */
+
+/* Header */
+.site-head {
+  position: fixed; inset: 0 0 auto 0; z-index: 40;
+  display: flex; justify-content: flex-end; align-items: center;
+  padding: 16px var(--gutter);
+  color: #fff; mix-blend-mode: difference; pointer-events: none;
+}
+.site-head a { pointer-events: auto; text-decoration: none; }
+.site-head :focus-visible { outline-color: #fff; }
+.head-right { display: flex; align-items: center; gap: 6px; }
+.menu-btn {
+  pointer-events: auto; display: inline-flex; align-items: center; gap: 12px;
+  min-height: 44px; padding: 0 2px 0 10px;
+  background: none; border: 0; color: inherit; cursor: pointer;
+  font: 600 .98rem/1 var(--label);
+}
+.menu-icon { position: relative; width: 26px; height: 26px; perspective: 140px; display: grid; place-items: center; }
+/* a wireframe cube; open, it turns face-on and becomes a square with a cross */
+.menu-cube {
+  position: relative; width: 15px; height: 15px; transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(45deg);
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+.menu-cube i { position: absolute; inset: 0; border: 1.5px solid currentColor; }
+.menu-cube i:nth-child(1) { transform: translateZ(7.5px); }
+.menu-cube i:nth-child(2) { transform: rotateY(180deg) translateZ(7.5px); }
+.menu-cube i:nth-child(3) { transform: rotateY(90deg) translateZ(7.5px); }
+.menu-cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(7.5px); }
+.menu-cube i:nth-child(5) { transform: rotateX(90deg) translateZ(7.5px); }
+.menu-cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(7.5px); }
+.menu-btn:hover .menu-cube { transform: rotateX(-30deg) rotateY(135deg); }
+.menu-x { position: absolute; inset: 0; opacity: 0; transition: opacity .25s; }
+.menu-x::before, .menu-x::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 11px; height: 1.5px;
+  background: currentColor; transform: translate(-50%, -50%) rotate(45deg);
+}
+.menu-x::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.menu-open .menu-cube { transform: rotateX(0deg) rotateY(0deg) scale(1.35); }
+.menu-open .menu-cube i:not(:first-child) { opacity: 0; }
+.menu-open .menu-x { opacity: 1; transition-delay: .25s; }
+
+.menu {
+  position: fixed; inset: 0; z-index: 34;
+  display: grid; align-content: safe center; overflow-y: auto;
+  padding: 96px var(--gutter) 48px;
+  background: rgba(5, 7, 10, .9);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s, visibility 0s linear .3s;
+}
+.menu-open .menu { opacity: 1; visibility: visible; transition: opacity .3s; }
+.menu-inner { width: 100%; max-width: 1240px; margin: 0 auto; display: grid; gap: clamp(32px, 6vh, 64px); }
+.menu-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--line-strong); }
+.menu-list li { border-bottom: 1.5px solid var(--line-strong); }
+.menu-list a {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: 8px 32px; align-items: baseline;
+  padding: clamp(12px, 2.4vh, 22px) 0; text-decoration: none;
+  transform: translateY(14px); opacity: 0;
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .4s;
+}
+.menu-open .menu-list a { transform: none; opacity: 1; }
+.menu-open .menu-list li:nth-child(2) a { transition-delay: .05s; }
+.menu-open .menu-list li:nth-child(3) a { transition-delay: .1s; }
+.menu-open .menu-list li:nth-child(4) a { transition-delay: .15s; }
+.menu-open .menu-list li:nth-child(5) a { transition-delay: .2s; }
+.menu-word {
+  font-family: var(--display); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.2rem, min(6.4vw, 8.5vh), 5rem); line-height: 1; letter-spacing: -.04em;
+}
+.menu-note { color: var(--muted); font-family: var(--label); font-size: .98rem; }
+.menu-list a:hover .menu-note { color: var(--text); }
+.menu-foot { margin: 0; color: var(--muted); font-family: var(--label); font-size: .9rem; }
+.menu-open .cursor { z-index: 36; }
+@media (max-width: 640px) { .menu-list a { grid-template-columns: 1fr; } }
+
+/* Cursor cube */
+.cursor {
+  position: fixed; left: 0; top: 0; z-index: 25; width: 0; height: 0;
+  pointer-events: none; mix-blend-mode: difference; opacity: 0; transition: opacity .25s;
+}
+.cursor.is-on { opacity: 1; }
+/* hidden over the opening corridor; it fades in once the corridor is scrolled away */
+.cursor.is-hidden { opacity: 0; }
+.cursor-scale {
+  position: absolute; left: -11px; top: -11px; width: 22px; height: 22px;
+  perspective: 700px; transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1);
+}
+.cursor.is-down .cursor-scale { transform: scale(.7); }
+.cursor.is-dock .cursor-scale { transform: none; }
+/* while docked on a menu item it rises above the page blocks, still under the header */
+.cursor.is-dock { z-index: 35; }
+.cursor.is-back .cursor-scale { transform: none; perspective: 2200px; }
+.cursor-cube i { transition: background-color .25s; }
+/* as a card's body the cube turns a quiet grey, so its sides read as depth, not as a second object */
+.cursor.is-back .cursor-cube i { background: #7c7c7c; }
+.cursor.is-back .cursor-cube i:nth-child(n+5) { background: #555555; }
+.cursor-dir { position: absolute; inset: 0; transform-style: preserve-3d; }
+.cursor-cube { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateX(-28deg) rotateY(40deg); }
+.cursor-cube i { position: absolute; inset: 0; background: #fff; backface-visibility: hidden; }
+.cursor-cube i:nth-child(1) { transform: translateZ(11px); }
+.cursor-cube i:nth-child(2) { transform: rotateY(180deg) translateZ(11px); }
+.cursor-cube i:nth-child(3) { transform: rotateY(90deg) translateZ(11px); background: #b8b8b8; }
+.cursor-cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(11px); background: #b8b8b8; }
+.cursor-cube i:nth-child(5) { transform: rotateX(90deg) translateZ(11px); background: #7c7c7c; }
+.cursor-cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(11px); background: #7c7c7c; }
+@media (hover: none), (pointer: coarse) { .cursor { display: none; } }
+/* These sit one layer above the cursor, so the cube slips behind them. */
+.cover, .cube-scene, .skill, .city { position: relative; z-index: 30; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-scale, .menu, .menu-list a, .menu-cube { transition: none; }
+}

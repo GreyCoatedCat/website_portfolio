@@ -1,0 +1,101 @@
+/* Project pages (project/NAME/index.html): title and cover, figures at a glance, the pipeline as numbered
+   blocks, a results chart, image strips and the footer. Loaded after base, chrome, sections and work. */
+
+/* a way back to the home page, on the left of the header */
+.site-head.has-back { justify-content: space-between; }
+.back { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font: 600 .95rem/1 var(--label); }
+.back-mark { width: 9px; height: 9px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateX(2px) rotate(45deg); }
+
+/* Title, lede, facts and cover */
+.pj-hero { padding-top: clamp(120px, 14vw, 176px); }
+.pj-kicker { margin: 0 0 20px; color: var(--muted); font: 600 .92rem/1.4 var(--label); }
+.pj-hero-grid {
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(36px, 5vw, 80px); align-items: start;
+}
+.pj-lede { margin: 0; max-width: 60ch; font-size: 1.22rem; line-height: 1.55; }
+.pj-hero .facts { margin-top: 32px; }
+.pj-hero .facts dd { max-width: 52ch; }
+.pj-cover { width: 100%; max-width: 480px; justify-self: end; }
+.pj-cover .cover { width: 100%; }
+
+/* Figures at a glance: a few numbers, each on its own block */
+.pj-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 18px; }
+.pj-stat {
+  display: grid; gap: 6px; align-content: start; padding: 22px 22px 20px;
+  background: var(--bg); border: 1.5px solid var(--line-strong);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547, 5px 5px 0 #212F3E;
+}
+.pj-stat strong { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1; letter-spacing: -.03em; }
+.pj-stat span { color: var(--muted); font-family: var(--label); font-size: .95rem; line-height: 1.4; }
+.pj-copy { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 72px); margin-top: clamp(40px, 5vw, 64px); }
+.pj-copy p { margin: 0 0 1em; max-width: 62ch; }
+.pj-copy .pj-aside { color: var(--muted); }
+
+/* The pipeline: numbered blocks in reading order */
+.pj-steps {
+  list-style: none; margin: 0; padding: 0; counter-reset: step;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px;
+}
+.pj-step { position: relative; display: grid; gap: 10px; align-content: start; padding: 24px 22px 22px; border: 1.5px solid var(--line-strong); background: var(--bg); }
+.pj-step::before {
+  counter-increment: step; content: counter(step, decimal-leading-zero);
+  display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 6px;
+  background: var(--accent); color: var(--ink); font: 700 .95rem/1 var(--label);
+  box-shadow: 1px 1px 0 #D9531C, 2px 2px 0 #C24817, 3px 3px 0 #A93E13, 4px 4px 0 #8F3410;
+}
+.pj-step h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.3rem; line-height: 1.2; }
+.pj-step p { margin: 0; color: var(--muted); }
+
+/* Results: a table whose accuracy column is drawn as bars. One measure, so no legend: the best run is
+   the only one in the accent colour, the rest stay grey, and every value is printed in text colour. */
+.pj-bars { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pj-bars caption { caption-side: bottom; padding-top: 14px; text-align: left; color: var(--muted); font: .9rem/1.4 var(--label); }
+.pj-bars th, .pj-bars td { padding: 14px 16px 14px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.pj-bars thead th { color: var(--muted); font: 600 .85rem/1.2 var(--label); border-bottom-color: var(--line-strong); }
+.pj-bars tbody th { font-weight: 600; white-space: nowrap; }
+.pj-bars .acc { width: 58%; }
+.pj-bars .num { width: 1%; white-space: nowrap; text-align: right; font-family: var(--label); }
+.pj-bars tbody tr { transition: background-color .2s; }
+.pj-bars tbody tr:hover { background: rgba(233, 228, 216, .04); }
+.pj-track { display: flex; align-items: center; gap: 12px; }
+.pj-bar { flex: none; height: 14px; width: calc(var(--v) * (100% - 64px)); background: #6C7F94; border-radius: 0 4px 4px 0; }
+.is-best .pj-bar { background: #F2602A; }
+.pj-val { font-family: var(--label); font-weight: 600; }
+.is-best th, .is-best .pj-val { color: var(--text); }
+
+/* Image strips: input, mask and overlay side by side */
+.pj-figs { display: grid; gap: 36px; margin-top: clamp(48px, 6vw, 72px); }
+.pj-fig { margin: 0; max-width: 960px; }
+.pj-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pj-strip figure { margin: 0; display: grid; gap: 8px; }
+.pj-strip img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border: 1.5px solid var(--line-strong); background: #000; }
+.pj-strip figcaption { color: var(--muted); font: .85rem/1.3 var(--label); }
+.pj-fig > figcaption { margin-top: 14px; max-width: 70ch; }
+.pj-fig > figcaption strong { font-weight: 600; }
+
+/* Screenshots: two to a row, cropped to the same shape */
+.pj-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+.pj-shots figure { margin: 0; display: grid; gap: 10px; }
+.pj-shots img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border: 1.5px solid var(--line-strong); background: #000; }
+.pj-shots figcaption { color: var(--muted); font: .9rem/1.4 var(--label); }
+
+/* Footer: back to all work, and the source */
+.pj-foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px 32px;
+  margin-top: clamp(72px, 9vw, 120px); padding-top: 24px; border-top: 1px solid var(--line-strong);
+  color: var(--muted); font: .9rem/1.4 var(--label);
+}
+.pj-foot p { margin: 0; }
+.pj-foot .social { margin: 0; }
+
+@media (max-width: 860px) {
+  .pj-hero-grid, .pj-copy { grid-template-columns: 1fr; }
+  .pj-cover { justify-self: start; max-width: 420px; }
+}
+@media (max-width: 520px) {
+  .pj-shots { grid-template-columns: 1fr; }
+  .pj-bars .num { display: none; }
+  .pj-bars .acc { width: auto; }
+  .pj-strip { gap: 8px; }
+}

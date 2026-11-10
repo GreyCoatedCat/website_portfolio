@@ -1,0 +1,122 @@
+/* What every section shares: frame and heading, the cube field and lighting behind it, and the entrances. */
+
+/* Sections */
+.section { padding: clamp(80px, 11vw, 150px) 0; }
+.section.alt { background: var(--bg); }
+.sec-head {
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: 16px 48px; align-items: end;
+  margin-bottom: clamp(40px, 6vw, 80px); padding-bottom: 24px;
+  border-bottom: 3px solid var(--text);
+}
+.sec-head h2, .sec-head h1 {
+  margin: 0;
+  font-family: var(--display); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.4rem, 6.6vw, 5.4rem); line-height: .94; letter-spacing: -.04em; text-wrap: balance;
+}
+.sec-head p { margin: 0; color: var(--muted); }
+.sub-h {
+  margin: 0 0 18px;
+  font-family: var(--display); font-weight: 600; letter-spacing: -.01em; font-size: 1.65rem; line-height: 1.1;
+}
+
+/* Background: a faint field of isometric cubes (the tumbling-blocks illusion) behind every section under the
+   cover, fullest at the sides and thinner behind the text, with a few cubes slowly lighting up. It drifts a
+   little slower than the page, so it reads as a layer further back. */
+.section { position: relative; }
+.section > .wrap { position: relative; }
+.section { --veil: rgba(10, 13, 18, .75); }
+.section.alt { --veil: rgba(10, 13, 18, .75); }
+.section.contact { --veil: rgba(5, 7, 10, .75); }
+.bg-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+/* Lighting, top layer first: each section fades up from black and back down to it, so sections meet in a dip
+   to black like cuts between shots; a warm key light (the corridor's colour) spills in from a top corner, on
+   alternate sides from one section to the next, with a cool fill low on the other side; and a veil in the
+   section's own colour thins the cube field behind the text. */
+.bg-field { --key-x: 86%; }
+.section:nth-of-type(odd) .bg-field { --key-x: 14%; }
+.bg-field::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, var(--void), rgba(5, 7, 10, 0) 170px, rgba(5, 7, 10, 0) calc(100% - 170px), var(--void)),
+    radial-gradient(ellipse 62% 640px at var(--key-x) 0, rgba(255, 122, 60, .085), rgba(255, 122, 60, 0) 72%),
+    radial-gradient(ellipse 50% 520px at calc(100% - var(--key-x)) 100%, rgba(127, 155, 181, .05), rgba(127, 155, 181, 0) 72%),
+    linear-gradient(90deg, transparent, var(--veil) 26%, var(--veil) 74%, transparent);
+}
+.bg-field-in {
+  position: absolute; left: 0; right: 0; top: -260px; bottom: -260px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath fill='%23E9E4D8' fill-opacity='.03' d='M0 -30L26 -15L0 0L-26 -15ZM52 -30L78 -15L52 0L26 -15ZM26 15L52 30L26 45L0 30ZM0 60L26 75L0 90L-26 75ZM52 60L78 75L52 90L26 75Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.016' d='M-26 -15L0 0L0 30L-26 15ZM26 -15L52 0L52 30L26 15ZM0 30L26 45L26 75L0 60ZM-26 75L0 90L0 120L-26 105ZM26 75L52 90L52 120L26 105Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.006' d='M0 0L26 -15L26 15L0 30ZM52 0L78 -15L78 15L52 30ZM26 45L52 30L52 60L26 75ZM0 90L26 75L26 105L0 120ZM52 90L78 75L78 105L52 120Z'/%3E%3C/svg%3E") 0 0 / 52px 90px;
+}
+.has-drift .bg-field-in { will-change: transform; }
+.bg-lit { position: absolute; width: 52px; height: 60px; color: var(--accent); opacity: .3; }
+.has-drift .bg-lit { animation: bg-lit 9s ease-in-out infinite; }
+.bg-lit svg { display: block; fill: currentColor; }
+@keyframes bg-lit { 0%, 100% { opacity: .15; } 50% { opacity: .55; } }
+
+/* Section entrances: a block pops up beside a heading, stretches across it, uncovers the words as it slides
+   off, folds back into a block and vanishes. Then the rule under the heading draws in and the content rises.
+   Only with JS and motion on; otherwise everything is simply there. */
+.rv { position: relative; display: inline-block; max-width: 100%; }
+.rv-block { display: none; }
+.reveal-on .rv-block {
+  display: block; position: absolute; top: 0; bottom: 0; left: -.04em; right: -.04em;
+  background: var(--accent); pointer-events: none;
+  transform-origin: 0 50%; transform: scale(0, 0);
+}
+.reveal-on .rv-text { opacity: 0; }
+.reveal-on .rv.in .rv-block { animation: rv-block 1.2s both; }
+.reveal-on .rv.in .rv-text { animation: rv-text 1.2s linear both; }
+@keyframes rv-block {
+  0% { transform: translateX(calc(var(--sq) * 50%)) scale(0, 0); animation-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+  17% { transform: translateX(0) scale(var(--sq), 1); }
+  25% { transform: translateX(0) scale(var(--sq), 1); animation-timing-function: cubic-bezier(.65, 0, .35, 1); }
+  50% { transform: translateX(0) scale(1, 1); }
+  57% { transform: translateX(0) scale(1, 1); animation-timing-function: cubic-bezier(.65, 0, .35, 1); }
+  83% { transform: translateX(calc((1 - var(--sq)) * 100%)) scale(var(--sq), 1); animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+  100% { transform: translateX(calc((1 - var(--sq) / 2) * 100%)) scale(0, 0); }
+}
+@keyframes rv-text { 0%, 53% { opacity: 0; } 54%, 100% { opacity: 1; } }
+.reveal-on .sec-head { position: relative; border-bottom-color: transparent; }
+.reveal-on .sec-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px; background: var(--text);
+  transform: scaleX(0); transform-origin: 0 50%;
+}
+.reveal-on .sec-head.in::after { transform: none; transition: transform 1s cubic-bezier(.65, 0, .35, 1) .62s; }
+.reveal-on .rv-up { opacity: 0; transform: translateY(var(--rv-y, 24px)); }
+.reveal-on .rv-up.in {
+  opacity: 1; transform: none;
+  transition: opacity .8s cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0s), transform 1.1s cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0s);
+}
+
+/* Fact list: label and value rows */
+.facts { display: grid; grid-template-columns: max-content 1fr; margin: 36px 0 0; border-top: 1px solid var(--line-strong); }
+.facts dt, .facts dd { padding: 14px 0; border-bottom: 1px solid var(--line-strong); }
+.facts dt { color: var(--muted); font-family: var(--label); font-size: .92rem; padding-right: 36px; }
+.facts dd { margin: 0; }
+
+/* Block buttons (quick links under About, links on project pages): small extruded blocks that lift when hovered */
+.social { list-style: none; margin: 32px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px 16px; }
+.soc {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px 0 14px;
+  background: var(--bg); color: var(--text); text-decoration: none;
+  border: 1.5px solid var(--line-strong);
+  font: 600 .92rem/1 var(--label);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547;
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s cubic-bezier(.2, .8, .2, 1), border-color .25s;
+}
+.soc::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--accent); }
+.soc:hover {
+  transform: translate(-2px, -2px); border-color: var(--text);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547, 5px 5px 0 #212F3E, 6px 6px 0 #1D2A38;
+}
+.soc:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053; }
+
+@media (max-width: 860px) {
+  .sec-head { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .social { display: grid; grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-drift .bg-lit { animation: none; opacity: .3; }
+}

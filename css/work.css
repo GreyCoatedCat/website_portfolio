@@ -1,0 +1,85 @@
+/* Selected work: project tiles with layered covers, and the list of more projects. */
+
+/* Work tiles */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: clamp(48px, 5vw, 72px) clamp(24px, 3vw, 40px);
+}
+.tile { display: grid; gap: 22px; align-content: start; }
+.cover { aspect-ratio: 1; perspective: 2200px; --rx: 0deg; --ry: 0deg; --lift: 0px; }
+.stack {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+}
+.layer {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  transform: translateZ(calc(var(--i) * var(--lift)));
+  transition: transform .6s cubic-bezier(.2, .7, .2, 1), filter .6s;
+}
+.layer:first-child { box-shadow: 0 0 0 1px var(--line-strong); }
+.cover.is-lifted { --lift: 30px; }
+/* A cover that opens a project page lights up on hover: its palette flips to ember (orange ground, dark lines,
+   pale accents), so the picture itself says it can be pressed. The colour tokens the covers draw with are
+   registered as colours, so the switch fades instead of jumping. */
+@property --ink { syntax: '<color>'; inherits: true; initial-value: #0E1620; }
+@property --void { syntax: '<color>'; inherits: true; initial-value: #05070A; }
+@property --paper { syntax: '<color>'; inherits: true; initial-value: #E9E4D8; }
+@property --paper-hi { syntax: '<color>'; inherits: true; initial-value: #DDD6C5; }
+@property --mid { syntax: '<color>'; inherits: true; initial-value: #3E5468; }
+@property --soft { syntax: '<color>'; inherits: true; initial-value: #8FA3B0; }
+@property --acc-fill { syntax: '<color>'; inherits: true; initial-value: #FF6A2B; }
+@property --acc-d { syntax: '<color>'; inherits: true; initial-value: #FF6A2B; }
+@property --acc-l { syntax: '<color>'; inherits: true; initial-value: #E2501A; }
+.cover.is-link {
+  cursor: pointer;
+  transition: --ink .45s ease, --void .45s ease, --paper .45s ease, --paper-hi .45s ease, --mid .45s ease,
+    --soft .45s ease, --acc-fill .45s ease, --acc-d .45s ease, --acc-l .45s ease;
+}
+.cover.is-link:hover, .tile:has(.tile-link:focus-visible) .cover.is-link {
+  --ink: #FF6A2B; --void: #FF6A2B; --mid: #C24817; --soft: #FFC4A3;
+  --paper: #0E1620; --paper-hi: #2A1A12; --acc-l: #FFF1E6; --acc-fill: #0E1620; --acc-d: #0E1620;
+}
+.cover.is-lifted .layer:not(:first-child) { filter: drop-shadow(0 12px 12px rgba(0, 0, 0, .55)); }
+.tile-body { display: grid; gap: 10px; }
+.tile h3 {
+  margin: 0;
+  font-family: var(--display); font-weight: 600; letter-spacing: -.01em; font-size: 1.65rem; line-height: 1.05;
+}
+.tile-meta { margin: 0; color: var(--muted); font-family: var(--label); font-size: .92rem; }
+.tile-body > p:not(.tile-meta) { margin: 0; max-width: 60ch; }
+.tags { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tile-link {
+  justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+  font-family: var(--label); font-weight: 600; font-size: .95rem; color: var(--text);
+  text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 5px;
+}
+.tile-link::before { content: ""; width: 8px; height: 8px; background: var(--accent); }
+.tile-link:hover { color: var(--accent); }
+.row-link { text-decoration: none; }
+.row-link:hover { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.cred-link {
+  display: inline-block; margin-top: 4px; font-family: var(--label); font-weight: 600; font-size: .88rem;
+  text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px;
+}
+.cred-link:hover { color: var(--accent); }
+.tags li { border: 1.5px solid var(--line-strong); padding: 3px 9px 1px; font-family: var(--label); font-size: .82rem; font-weight: 600; }
+
+.more { margin-top: clamp(80px, 10vw, 130px); }
+.rows { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--line-strong); }
+.rows li {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr) minmax(0, 1fr);
+  gap: 6px 32px; padding: 18px 0; border-bottom: 1.5px solid var(--line-strong);
+}
+.row-title { font-weight: 700; display: flex; gap: 12px; align-items: baseline; }
+.row-title::before { content: ""; flex: none; width: 10px; height: 10px; background: var(--accent); transform: translateY(-1px); }
+.row-ctx { color: var(--muted); font-family: var(--label); font-size: .92rem; text-align: right; }
+
+@media (max-width: 860px) {
+  .rows li { grid-template-columns: 1fr; }
+  .row-ctx { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stack, .layer, .cover.is-link { transition: none; }
+}

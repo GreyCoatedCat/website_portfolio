@@ -1,0 +1,137 @@
+/* The opening: corridor canvas, name, scroll cue, interface toggle, opening shot and loading screen. */
+
+/* Hero */
+.hero {
+  position: relative; overflow: hidden;
+  height: 100vh; height: 100svh; min-height: 560px;
+  background: var(--void); color: var(--text);
+}
+.corridor { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* the jumper can be picked up: a hand over it, a closed hand while carrying it */
+.hero.can-grab { cursor: grab; }
+.hero.is-carrying { cursor: grabbing; }
+/* darkens the top and bottom so the header and the name stay readable; a static layer, so it costs nothing per frame */
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .85), rgba(0, 0, 0, .6) 7.5%, transparent 17%, transparent 50%, rgba(0, 0, 0, .45) 75%, rgba(3, 4, 6, .82) 92%, var(--void));
+  transition: opacity .4s;
+}
+.hud-off .hero::after { opacity: 0; }
+.hero-name {
+  /* one line, centred under the corridor and fitted to the full width (see fitName) */
+  position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(84px, 12vh, 124px);
+  margin: 0; text-align: center; white-space: nowrap;
+  font-family: var(--display); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.5rem, 7vw, 9rem); line-height: .92; letter-spacing: -.04em;
+  color: var(--text); text-shadow: 0 2px 30px rgba(0, 0, 0, .5);
+  transform-origin: 50% 100%; will-change: transform, opacity; z-index: 2;
+}
+.scroll-cue {
+  position: absolute; left: 50%; bottom: clamp(18px, 3.5vh, 32px); z-index: 2; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 44px; min-height: 44px; padding: 2px 0;
+  color: var(--text); text-decoration: none; font-family: var(--label); font-size: .82rem; font-weight: 600;
+  transition: opacity .3s;
+}
+/* a wireframe cube with an orange top that rolls forward and drops a step, over and over */
+.cue-cube { position: relative; width: 24px; height: 24px; perspective: 140px; display: grid; place-items: center; }
+.cue-drop { display: block; transform-style: preserve-3d; animation: cue-drop 2.2s cubic-bezier(.65, 0, .35, 1) infinite; }
+.cue-iso { display: block; transform-style: preserve-3d; transform: rotateX(-24deg) rotateY(36deg); }
+.cue-roll { display: block; position: relative; width: 11px; height: 11px; transform-style: preserve-3d; animation: cue-roll 2.2s cubic-bezier(.65, 0, .35, 1) infinite; }
+.cue-roll i { position: absolute; inset: 0; border: 1.5px solid currentColor; }
+.cue-roll i:nth-child(1) { transform: translateZ(5.5px); }
+.cue-roll i:nth-child(2) { transform: rotateY(180deg) translateZ(5.5px); }
+.cue-roll i:nth-child(3) { transform: rotateY(90deg) translateZ(5.5px); }
+.cue-roll i:nth-child(4) { transform: rotateY(-90deg) translateZ(5.5px); }
+.cue-roll i:nth-child(5) { transform: rotateX(90deg) translateZ(5.5px); background: var(--accent); border-color: var(--accent); }
+.cue-roll i:nth-child(6) { transform: rotateX(-90deg) translateZ(5.5px); }
+@keyframes cue-drop {
+  0% { transform: translateY(-4px); opacity: 0; }
+  18% { opacity: 1; }
+  70% { transform: translateY(5px); opacity: 1; }
+  100% { transform: translateY(5px); opacity: 0; }
+}
+@keyframes cue-roll { 0% { transform: rotateX(0deg); } 70%, 100% { transform: rotateX(-90deg); } }
+
+/* Hide HUD: a small eye in the header clears the name, header and scroll cue off the corridor */
+.hud-btn {
+  pointer-events: auto; display: grid; place-items: center; width: 44px; height: 44px;
+  background: none; border: 0; padding: 0; color: inherit; cursor: pointer;
+  transition: opacity .3s, visibility 0s;
+}
+.hud-btn svg { width: 22px; height: 22px; display: block; }
+.hud-btn:hover svg { transform: scale(1.1); }
+/* only meaningful over the corridor, and out of the way while the menu is open */
+.past-hero .hud-btn, .menu-open .hud-btn { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility 0s linear .3s; }
+.hero:focus { outline: none; }
+.site-head, .hero-name, .scroll-cue { transition: opacity .4s, visibility 0s; }
+.hud-off .site-head, .hud-off .hero-name, .hud-off .scroll-cue {
+  opacity: 0 !important; visibility: hidden; pointer-events: none;
+  transition: opacity .4s, visibility 0s linear .4s;
+}
+
+/* Opening shot: film bars, the name letter by letter from the middle out, then the interface */
+.hero-fit .w { white-space: nowrap; }
+.hero-fit .ch { display: inline-block; }
+.cine-bars { display: none; }
+.intro-pre .cine-bars { display: block; position: fixed; inset: 0; z-index: 41; pointer-events: none; }
+.cine-bars i { position: absolute; left: 0; right: 0; height: 9vh; background: var(--void); transition: transform 1.8s cubic-bezier(.65, 0, .35, 1); }
+.cine-bars i:first-child { top: 0; transform-origin: 50% 0; }
+.cine-bars i:last-child { bottom: 0; transform-origin: 50% 100%; }
+.bars-out .cine-bars i { transform: scaleY(0); }
+.intro-fast .cine-bars i { transition-duration: .45s; }
+.intro-pre .hero-fit .ch { opacity: 0; transform: translateY(.38em) scale(1.08); filter: blur(14px); }
+.intro-pre.name-in .hero-fit .ch {
+  opacity: 1; transform: none; filter: blur(0);
+  transition: opacity 1.6s cubic-bezier(.22, 1, .36, 1) var(--d), transform 2.4s cubic-bezier(.22, 1, .36, 1) var(--d), filter 1.9s cubic-bezier(.22, 1, .36, 1) var(--d);
+}
+@media (hover: none), (pointer: coarse) { .intro-pre .hero-fit .ch { filter: none; } }
+.intro-pre .site-head, .intro-pre .scroll-cue { opacity: 0; pointer-events: none; }
+.intro-pre.ui-in .site-head, .intro-pre.ui-in .scroll-cue { opacity: 1; pointer-events: auto; transition: opacity 1.4s ease; }
+.intro-pre.ui-in .site-head { pointer-events: none; }
+.intro-pre.intro-fast .site-head, .intro-pre.intro-fast .scroll-cue { transition-duration: .4s; }
+
+/* Loading screen: eight blocks that come apart and lock back into a cube */
+.loader { display: none; }
+.js .loader {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; place-content: center; justify-items: center; gap: 30px;
+  background: var(--void);
+  transition: opacity .55s ease, visibility 0s linear .55s;
+  animation: loader-failsafe .5s ease 8s forwards;
+}
+.is-loaded .loader { opacity: 0; visibility: hidden; }
+.is-loading { overflow: hidden; }
+@keyframes loader-failsafe { to { opacity: 0; visibility: hidden; } }
+.loader-scene { width: 96px; height: 96px; perspective: 600px; display: grid; place-items: center; }
+.loader-cube { position: relative; width: 18px; height: 18px; transform-style: preserve-3d; animation: loader-spin 7s linear infinite; }
+.is-loaded .loader-cube { animation-play-state: paused; }
+@keyframes loader-spin { from { transform: rotateX(-28deg) rotateY(0deg); } to { transform: rotateX(-28deg) rotateY(360deg); } }
+.lc { position: absolute; inset: 0; transform-style: preserve-3d; animation: lc-breathe 1.7s cubic-bezier(.65, 0, .35, 1) infinite; }
+@keyframes lc-breathe {
+  0%, 100% { transform: translate3d(calc(var(--x) * 9px), calc(var(--y) * 9px), calc(var(--z) * 9px)); }
+  50% { transform: translate3d(calc(var(--x) * 16px), calc(var(--y) * 16px), calc(var(--z) * 16px)); }
+}
+.lc i { position: absolute; inset: 0; }
+.lc i:nth-child(1) { transform: translateZ(9px); background: #4A5B70; }
+.lc i:nth-child(2) { transform: rotateY(180deg) translateZ(9px); background: #3E5468; }
+.lc i:nth-child(3) { transform: rotateY(90deg) translateZ(9px); background: #2E3F52; }
+.lc i:nth-child(4) { transform: rotateY(-90deg) translateZ(9px); background: #5A6B80; }
+.lc i:nth-child(5) { transform: rotateX(90deg) translateZ(9px); background: #E9E4D8; }
+.lc i:nth-child(6) { transform: rotateX(-90deg) translateZ(9px); background: #1C2430; }
+.lc.hot i:nth-child(1) { background: #FF6A2B; }
+.lc.hot i:nth-child(2) { background: #E05A20; }
+.lc.hot i:nth-child(3) { background: #C9501F; }
+.lc.hot i:nth-child(4) { background: #FF8A55; }
+.lc.hot i:nth-child(5) { background: #FFB08A; }
+.loader-text { margin: 0; color: var(--muted); font-family: var(--label); font-size: .9rem; font-weight: 600; }
+
+@media (max-width: 520px) {
+  .hero-name { white-space: normal; text-wrap: balance; font-size: clamp(2.2rem, 11vw, 3.4rem); line-height: .92; bottom: 100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cue-drop, .cue-roll { animation: none; }
+  .lc, .loader-cube { animation: none; }
+  .loader-cube { transform: rotateX(-28deg) rotateY(40deg); }
+  .lc { transform: translate3d(calc(var(--x) * 9px), calc(var(--y) * 9px), calc(var(--z) * 9px)); }
+}

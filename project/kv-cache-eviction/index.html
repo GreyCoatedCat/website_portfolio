@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evolving KV-cache eviction · Erdizah Ghodi Al Haidar</title>
+<meta name="description" content="A genetic algorithm that searches for KV-cache eviction policies in LLM inference and reports the trade-off between memory saved and output quality as a Pareto front.">
+<link rel="canonical" href="https://erdizah.my.id/project/kv-cache-eviction/">
+<meta name="theme-color" content="#05070A">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wght@400..700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/chrome.css">
+<link rel="stylesheet" href="../../css/sections.css">
+<link rel="stylesheet" href="../../css/work.css">
+<link rel="stylesheet" href="../../css/project.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to content</a>
+<div class="cursor" aria-hidden="true"><div class="cursor-scale"><div class="cursor-dir"><div class="cursor-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+
+<header class="site-head has-back">
+  <a class="back" href="../../#work"><span class="back-mark" aria-hidden="true"></span>All work</a>
+  <div class="head-right">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+    <span class="menu-label">Menu</span>
+    <span class="menu-icon" aria-hidden="true"><span class="menu-cube"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="menu-x"></span></span>
+  </button>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu-inner">
+    <nav aria-label="Sections">
+      <ul class="menu-list">
+        <li><a href="../../#about"><span class="menu-word">About</span></a></li>
+        <li><a href="../../#experience"><span class="menu-word">Experience</span></a></li>
+        <li><a href="../../#work"><span class="menu-word">Work</span></a></li>
+        <li><a href="../../#skills"><span class="menu-word">Skills</span></a></li>
+        <li><a href="../../#contact"><span class="menu-word">Contact</span></a></li>
+      </ul>
+    </nav>
+    <p class="menu-foot">Erdizah Ghodi Al Haidar, Computer Science, Universitas Gadjah Mada</p>
+  </div>
+</div>
+
+<main>
+  <section class="section pj-hero" aria-labelledby="pj-title">
+    <div class="wrap">
+      <p class="pj-kicker">Genetic Algorithms course &middot; Team project &middot; 2026</p>
+      <header class="sec-head">
+        <h1 id="pj-title">Evolving KV-cache eviction</h1>
+      </header>
+      <div class="pj-hero-grid">
+        <div data-reveal>
+          <p class="pj-lede">While a language model generates text it keeps a cache of past keys and values, and that cache grows with every token. This project uses a genetic algorithm to search for eviction policies that decide what to drop, and shows the trade-off between memory saved and output quality as a Pareto front.</p>
+          <dl class="facts">
+            <dt>My part</dt><dd>[What you built]</dd>
+            <dt>Team</dt><dd>[Teammates, or remove this row]</dd>
+            <dt>Stack</dt><dd>[Language, model and libraries]</dd>
+          </dl>
+        </div>
+        <div class="pj-cover" data-reveal>
+          <div class="cover" aria-hidden="true"><div class="stack"><!--cover:kvcache--><svg class="layer" style="--i:0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" style="fill:var(--paper-hi)"/><rect x=".75" y=".75" width="98.5" height="98.5" fill="none" style="stroke:var(--ink)" stroke-width="1.5"/><g fill="none" style="stroke:var(--soft)" stroke-width="0.5"><rect x="7" y="7" width="9" height="9"/><rect x="7" y="18" width="9" height="9"/><rect x="7" y="29" width="9" height="9"/><rect x="7" y="40" width="9" height="9"/><rect x="7" y="51" width="9" height="9"/><rect x="7" y="62" width="9" height="9"/><rect x="7" y="73" width="9" height="9"/><rect x="7" y="84" width="9" height="9"/><rect x="18" y="7" width="9" height="9"/><rect x="18" y="18" width="9" height="9"/><rect x="18" y="29" width="9" height="9"/><rect x="18" y="40" width="9" height="9"/><rect x="18" y="51" width="9" height="9"/><rect x="18" y="62" width="9" height="9"/><rect x="18" y="73" width="9" height="9"/><rect x="18" y="84" width="9" height="9"/><rect x="29" y="7" width="9" height="9"/><rect x="29" y="18" width="9" height="9"/><rect x="29" y="29" width="9" height="9"/><rect x="29" y="40" width="9" height="9"/><rect x="29" y="51" width="9" height="9"/><rect x="29" y="62" width="9" height="9"/><rect x="29" y="73" width="9" height="9"/><rect x="29" y="84" width="9" height="9"/><rect x="40" y="7" width="9" height="9"/><rect x="40" y="18" width="9" height="9"/><rect x="40" y="29" width="9" height="9"/><rect x="40" y="40" width="9" height="9"/><rect x="40" y="51" width="9" height="9"/><rect x="40" y="62" width="9" height="9"/><rect x="40" y="73" width="9" height="9"/><rect x="40" y="84" width="9" height="9"/><rect x="51" y="7" width="9" height="9"/><rect x="51" y="18" width="9" height="9"/><rect x="51" y="29" width="9" height="9"/><rect x="51" y="40" width="9" height="9"/><rect x="51" y="51" width="9" height="9"/><rect x="51" y="62" width="9" height="9"/><rect x="51" y="73" width="9" height="9"/><rect x="51" y="84" width="9" height="9"/><rect x="62" y="7" width="9" height="9"/><rect x="62" y="18" width="9" height="9"/><rect x="62" y="29" width="9" height="9"/><rect x="62" y="40" width="9" height="9"/><rect x="62" y="51" width="9" height="9"/><rect x="62" y="62" width="9" height="9"/><rect x="62" y="73" width="9" height="9"/><rect x="62" y="84" width="9" height="9"/><rect x="73" y="7" width="9" height="9"/><rect x="73" y="18" width="9" height="9"/><rect x="73" y="29" width="9" height="9"/><rect x="73" y="40" width="9" height="9"/><rect x="73" y="51" width="9" height="9"/><rect x="73" y="62" width="9" height="9"/><rect x="73" y="73" width="9" height="9"/><rect x="73" y="84" width="9" height="9"/><rect x="84" y="7" width="9" height="9"/><rect x="84" y="18" width="9" height="9"/><rect x="84" y="29" width="9" height="9"/><rect x="84" y="40" width="9" height="9"/><rect x="84" y="51" width="9" height="9"/><rect x="84" y="62" width="9" height="9"/><rect x="84" y="73" width="9" height="9"/><rect x="84" y="84" width="9" height="9"/></g></svg><svg class="layer" style="--i:1" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><g style="fill:var(--ink)"><rect x="7" y="7" width="9" height="9"/><rect x="7" y="18" width="9" height="9"/><rect x="7" y="29" width="9" height="9"/><rect x="7" y="40" width="9" height="9"/><rect x="7" y="51" width="9" height="9"/><rect x="7" y="62" width="9" height="9"/><rect x="7" y="73" width="9" height="9"/><rect x="7" y="84" width="9" height="9"/><rect x="18" y="7" width="9" height="9"/><rect x="18" y="18" width="9" height="9"/><rect x="18" y="40" width="9" height="9"/><rect x="18" y="62" width="9" height="9"/><rect x="18" y="73" width="9" height="9"/><rect x="29" y="7" width="9" height="9"/><rect x="29" y="18" width="9" height="9"/><rect x="29" y="29" width="9" height="9"/><rect x="29" y="40" width="9" height="9"/><rect x="29" y="51" width="9" height="9"/><rect x="29" y="73" width="9" height="9"/><rect x="29" y="84" width="9" height="9"/><rect x="40" y="40" width="9" height="9"/><rect x="40" y="62" width="9" height="9"/><rect x="40" y="84" width="9" height="9"/><rect x="51" y="7" width="9" height="9"/><rect x="51" y="18" width="9" height="9"/><rect x="51" y="29" width="9" height="9"/><rect x="51" y="51" width="9" height="9"/><rect x="51" y="84" width="9" height="9"/><rect x="62" y="18" width="9" height="9"/><rect x="62" y="29" width="9" height="9"/><rect x="62" y="40" width="9" height="9"/><rect x="62" y="62" width="9" height="9"/><rect x="62" y="73" width="9" height="9"/><rect x="73" y="7" width="9" height="9"/><rect x="73" y="18" width="9" height="9"/><rect x="73" y="29" width="9" height="9"/><rect x="73" y="40" width="9" height="9"/><rect x="73" y="51" width="9" height="9"/><rect x="73" y="62" width="9" height="9"/><rect x="73" y="73" width="9" height="9"/><rect x="73" y="84" width="9" height="9"/><rect x="84" y="7" width="9" height="9"/><rect x="84" y="18" width="9" height="9"/><rect x="84" y="29" width="9" height="9"/><rect x="84" y="40" width="9" height="9"/><rect x="84" y="51" width="9" height="9"/><rect x="84" y="62" width="9" height="9"/><rect x="84" y="73" width="9" height="9"/><rect x="84" y="84" width="9" height="9"/></g></svg><svg class="layer" style="--i:2" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M10 14H22V20H34V28H46V38H58V50H72V64H88V82" fill="none" style="stroke:var(--paper-hi)" stroke-width="3.6"/><path d="M10 14H22V20H34V28H46V38H58V50H72V64H88V82" fill="none" style="stroke:var(--acc-l)" stroke-width="1.6"/><g style="fill:var(--acc-l);stroke:var(--paper-hi)" stroke-width=".9"><rect x="7.4" y="11.4" width="5.2" height="5.2"/><rect x="19.4" y="17.4" width="5.2" height="5.2"/><rect x="31.4" y="25.4" width="5.2" height="5.2"/><rect x="43.4" y="35.4" width="5.2" height="5.2"/><rect x="55.4" y="47.4" width="5.2" height="5.2"/><rect x="69.4" y="61.4" width="5.2" height="5.2"/><rect x="85.4" y="79.4" width="5.2" height="5.2"/></g></svg><!--/cover:kvcache--></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="overview-title">Overview</h2>
+      </header>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>Long conversations and long documents make the KV cache the main memory cost of serving a language model. Dropping entries saves memory but can hurt the answers, and the right balance depends on how much quality one is willing to give up.</p>
+          <p>So the search does not look for one best policy. It keeps every policy that is not beaten on both memory and quality at once, which is the Pareto front.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="method" aria-labelledby="method-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="method-title">Method</h2>
+      </header>
+      <ol class="pj-steps">
+        <li class="pj-step" data-reveal><h3>A policy as a genome</h3><p>Each candidate eviction policy is written as a genome the algorithm can cross and mutate. [How a policy is encoded.]</p></li>
+        <li class="pj-step" data-reveal><h3>Two scores</h3><p>Every policy is scored on the memory it saves and on the quality of the text the model produces with it.</p></li>
+        <li class="pj-step" data-reveal><h3>Evolve the front</h3><p>Selection, crossover and mutation over many generations keep the policies that no other policy beats on both scores.</p></li>
+        <li class="pj-step" data-reveal><h3>Read the trade-off</h3><p>The final front shows how much quality each step of memory saving costs.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="results-title">Results</h2>
+      </header>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>[The Pareto front once the runs are done, compared with simple baselines such as keeping only the most recent tokens.]</p>
+        </div>
+      </div>
+
+      <footer class="pj-foot">
+        <ul class="social" aria-label="More">
+          <li><a class="soc" href="../../#work">All work</a></li>
+        </ul>
+        <p>&copy; 2026 Erdizah Ghodi Al Haidar</p>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<script src="../../js/util.js"></script>
+<script src="../../js/selection.js"></script>
+<script src="../../js/menu.js"></script>
+<script src="../../js/background.js"></script>
+<script src="../../js/reveal.js"></script>
+<script src="../../js/cursor.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tuberculosis screening from chest X-rays · Erdizah Ghodi Al Haidar</title>
+<meta name="description" content="A chest X-ray screening pipeline for tuberculosis built with classic image processing and an SVM: lung segmentation, hand-made features and 91.9% accuracy on 1,400 held-out X-rays.">
+<link rel="canonical" href="https://erdizah.my.id/project/tb-xray-screening/">
+<meta name="theme-color" content="#05070A">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wght@400..700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/chrome.css">
+<link rel="stylesheet" href="../../css/sections.css">
+<link rel="stylesheet" href="../../css/work.css">
+<link rel="stylesheet" href="../../css/project.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to content</a>
+<div class="cursor" aria-hidden="true"><div class="cursor-scale"><div class="cursor-dir"><div class="cursor-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+
+<header class="site-head has-back">
+  <a class="back" href="../../#work"><span class="back-mark" aria-hidden="true"></span>All work</a>
+  <div class="head-right">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+    <span class="menu-label">Menu</span>
+    <span class="menu-icon" aria-hidden="true"><span class="menu-cube"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="menu-x"></span></span>
+  </button>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu-inner">
+    <nav aria-label="Sections">
+      <ul class="menu-list">
+        <li><a href="../../#about"><span class="menu-word">About</span></a></li>
+        <li><a href="../../#experience"><span class="menu-word">Experience</span></a></li>
+        <li><a href="../../#work"><span class="menu-word">Work</span></a></li>
+        <li><a href="../../#skills"><span class="menu-word">Skills</span></a></li>
+        <li><a href="../../#contact"><span class="menu-word">Contact</span></a></li>
+      </ul>
+    </nav>
+    <p class="menu-foot">Erdizah Ghodi Al Haidar, Computer Science, Universitas Gadjah Mada</p>
+  </div>
+</div>
+
+<main>
+  <section class="section pj-hero" aria-labelledby="pj-title">
+    <div class="wrap">
+      <p class="pj-kicker">Digital Image Processing &middot; Universitas Gadjah Mada &middot; 2025</p>
+      <header class="sec-head">
+        <h1 id="pj-title">Tuberculosis screening from chest X-rays</h1>
+      </header>
+      <div class="pj-hero-grid">
+        <div data-reveal>
+          <p class="pj-lede">A screening aid that tells a healthy chest X-ray from one showing tuberculosis. It uses classic image processing rather than a deep network: find the lungs, describe them with a few dozen hand-made numbers, and let an SVM make the call.</p>
+          <dl class="facts">
+            <dt>My part</dt><dd>[What you built: for example the segmentation stage, the features, the model or the Flask app]</dd>
+            <dt>Team</dt><dd>Keyne Elvaretta, Widad M Rafi, Gracella Wiendy Koesnadi and Erdizah Ghodi Al Haidar</dd>
+            <dt>Data</dt><dd>Tuberculosis (TB) Chest X-ray Database, IEEE DataPort: 3,500 normal and 3,500 TB images</dd>
+            <dt>Stack</dt><dd>Python, OpenCV, scikit-image, scikit-learn, Flask</dd>
+          </dl>
+          <ul class="social" aria-label="Project links">
+            <li><a class="soc" href="https://github.com/gracella12/PCD_Group6_FinalProject">Source code</a></li>
+          </ul>
+        </div>
+        <div class="pj-cover" data-reveal>
+          <div class="cover" aria-hidden="true"><div class="stack"><!--cover:tb--><svg class="layer" style="--i:0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" style="fill:var(--ink)"/><rect x="8" y="8" width="84" height="84" fill="none" style="stroke:var(--mid)" stroke-width="0.6"/><path d="M18 92C18 62 20 36 33 24C39 19 45 17 50 17C55 17 61 19 67 24C80 36 82 62 82 92Z" style="fill:var(--mid)"/></svg><svg class="layer" style="--i:1" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M45 27C37 25 27 35 25 51C23 65 25 75 31 79C37 81 43 77 45 71Z" style="fill:var(--ink)"/><path d="M55 27C63 25 73 35 75 51C77 65 75 75 69 79C63 81 57 77 55 71Z" style="fill:var(--ink)"/><g fill="none" style="stroke:var(--soft)" stroke-width="0.55" opacity=".55"><path d="M24 33Q50 25 76 33"/><path d="M24 41Q50 33 76 41"/><path d="M24 49Q50 41 76 49"/><path d="M24 57Q50 49 76 57"/><path d="M24 65Q50 57 76 65"/><path d="M24 73Q50 65 76 73"/></g><g style="fill:var(--soft)" opacity=".8"><rect x="47.2" y="20.0" width="5.6" height="4.4"/><rect x="47.2" y="26.2" width="5.6" height="4.4"/><rect x="47.2" y="32.4" width="5.6" height="4.4"/><rect x="47.2" y="38.6" width="5.6" height="4.4"/><rect x="47.2" y="44.8" width="5.6" height="4.4"/><rect x="47.2" y="51.0" width="5.6" height="4.4"/><rect x="47.2" y="57.2" width="5.6" height="4.4"/><rect x="47.2" y="63.4" width="5.6" height="4.4"/><rect x="47.2" y="69.6" width="5.6" height="4.4"/><rect x="47.2" y="75.8" width="5.6" height="4.4"/><rect x="47.2" y="82.0" width="5.6" height="4.4"/></g></svg><svg class="layer" style="--i:2" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M45 27C37 25 27 35 25 51C23 65 25 75 31 79C37 81 43 77 45 71Z" fill="none" style="stroke:var(--acc-l)" stroke-width="1.2"/><path d="M55 27C63 25 73 35 75 51C77 65 75 75 69 79C63 81 57 77 55 71Z" fill="none" style="stroke:var(--acc-l)" stroke-width="1.2"/><path d="M14 22V14H22M78 14H86V22M86 78V86H78M22 86H14V78" fill="none" style="stroke:var(--paper)" stroke-width="1"/><rect x="61" y="19" width="17" height="6" style="fill:var(--acc-fill)"/><text x="62.3" y="23.4" font-size="3.9" font-family="Overpass, Archivo, sans-serif" font-weight="700" style="fill:var(--ink)">TB 0.92</text></svg><!--/cover:tb--></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="overview-title">Overview</h2>
+      </header>
+      <ul class="pj-stats">
+        <li class="pj-stat" data-reveal><strong>7,000</strong><span>chest X-rays, half normal and half TB</span></li>
+        <li class="pj-stat" data-reveal><strong>91.9%</strong><span>accuracy on 1,400 X-rays the model never saw</span></li>
+        <li class="pj-stat" data-reveal><strong>0.92</strong><span>recall on TB cases, the ones a screen must not miss</span></li>
+      </ul>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>Tuberculosis is still one of the deadliest infections, and Indonesia carries the second-largest share of cases in the world. Reading chest X-rays is a common first check, but it depends on radiologists, who are scarce outside the big cities.</p>
+          <p>The aim was a fast, consistent first pass that runs on an ordinary computer and whose every step can be shown to a person: what the lungs look like after cleanup, which region was measured, and which numbers drove the decision.</p>
+        </div>
+        <p class="pj-aside">This is a course project and a screening aid, not a diagnostic tool.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pipeline" aria-labelledby="pipeline-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="pipeline-title">Pipeline</h2>
+      </header>
+      <ol class="pj-steps">
+        <li class="pj-step" data-reveal><h3>Standardise</h3><p>Grayscale, longest side scaled to 256 px and padded to a square, then CLAHE contrast (clip 1.5, 8&times;8 tiles), a light blur and min&ndash;max normalisation.</p></li>
+        <li class="pj-step" data-reveal><h3>Find the lungs</h3><p>Otsu thresholding on a blurred copy picks out the dark lung fields, with a fallback when the first mask comes out too small.</p></li>
+        <li class="pj-step" data-reveal><h3>Clean the mask</h3><p>Closing and opening fill small gaps and remove specks; the regions left are scored by size and shape, and the two most lung-like are kept.</p></li>
+        <li class="pj-step" data-reveal><h3>Crop to the lungs</h3><p>The image is cut to the mask's bounding box and fitted to 128&times;128, so every sample is measured on the same region.</p></li>
+        <li class="pj-step" data-reveal><h3>Describe</h3><p>Intensity statistics (mean, spread, entropy, skew, kurtosis), a 16-bin histogram and HOG edge-orientation features.</p></li>
+        <li class="pj-step" data-reveal><h3>Classify</h3><p>Random forest, gradient boosting and an RBF SVM compared; the SVM tuned by a 30-round random search over C and &gamma; with 5-fold stratified cross-validation.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="results-title">Results</h2>
+      </header>
+      <table class="pj-bars" data-reveal>
+        <caption>On 1,400 held-out X-rays (711 normal, 689 TB). Tuning moved the SVM from 88.9% to 91.9%, and its best cross-validation score was 90.1%.</caption>
+        <thead>
+          <tr><th scope="col">Classifier</th><th scope="col" class="acc">Accuracy</th><th scope="col" class="num">TB recall</th><th scope="col" class="num">Normal recall</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Random forest</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.8779"></span><span class="pj-val">87.8%</span></span></td><td class="num">0.85</td><td class="num">0.91</td></tr>
+          <tr><th scope="row">Gradient boosting</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.8957"></span><span class="pj-val">89.6%</span></span></td><td class="num">0.88</td><td class="num">0.91</td></tr>
+          <tr><th scope="row">SVM</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.8893"></span><span class="pj-val">88.9%</span></span></td><td class="num">0.87</td><td class="num">0.91</td></tr>
+          <tr class="is-best"><th scope="row">SVM, tuned</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.9186"></span><span class="pj-val">91.9%</span></span></td><td class="num">0.92</td><td class="num">0.92</td></tr>
+        </tbody>
+      </table>
+
+      <div class="pj-figs">
+        <figure class="pj-fig" data-reveal>
+          <div class="pj-strip">
+            <figure><img src="img/normal-xray.webp" alt="Chest X-ray of a healthy patient" width="384" height="384" loading="lazy"><figcaption>X-ray</figcaption></figure>
+            <figure><img src="img/normal-mask.webp" alt="The lung mask found for it: two white lung shapes on black" width="384" height="384" loading="lazy"><figcaption>Lung mask</figcaption></figure>
+            <figure><img src="img/normal-overlay.webp" alt="The mask outlined in red over the X-ray" width="384" height="384" loading="lazy"><figcaption>Overlay</figcaption></figure>
+          </div>
+          <figcaption><strong>A normal case.</strong> The lung fields come out clean, so the features describe only lung tissue.</figcaption>
+        </figure>
+        <figure class="pj-fig" data-reveal>
+          <div class="pj-strip">
+            <figure><img src="img/tb-xray.webp" alt="Chest X-ray of a patient with tuberculosis" width="384" height="384" loading="lazy"><figcaption>X-ray</figcaption></figure>
+            <figure><img src="img/tb-mask.webp" alt="The lung mask found for it" width="384" height="384" loading="lazy"><figcaption>Lung mask</figcaption></figure>
+            <figure><img src="img/tb-overlay.webp" alt="The mask outlined in red over the X-ray" width="384" height="384" loading="lazy"><figcaption>Overlay</figcaption></figure>
+          </div>
+          <figcaption><strong>A TB case, as shown by the Flask app.</strong> Upload an X-ray and the app returns the mask, the overlay and the call with its probability. Thresholding is fast but fragile: on films with a dark border or low contrast it can take the background instead of the lungs, and a learned segmentation model would be the next step.</figcaption>
+        </figure>
+      </div>
+
+      <footer class="pj-foot">
+        <ul class="social" aria-label="More">
+          <li><a class="soc" href="../../#work">All work</a></li>
+          <li><a class="soc" href="https://github.com/gracella12/PCD_Group6_FinalProject">Source code</a></li>
+        </ul>
+        <p>&copy; 2026 Erdizah Ghodi Al Haidar</p>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<script src="../../js/util.js"></script>
+<script src="../../js/selection.js"></script>
+<script src="../../js/menu.js"></script>
+<script src="../../js/background.js"></script>
+<script src="../../js/reveal.js"></script>
+<script src="../../js/cursor.js"></script>
+</body>
+</html>

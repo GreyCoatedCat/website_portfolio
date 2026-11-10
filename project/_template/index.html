@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Project page template. To add a page:
+  1. Copy this folder to project/your-project-name/ (lowercase, words joined by hyphens).
+     It will be served at https://erdizah.my.id/project/your-project-name/
+  2. Replace every [bracketed] placeholder, including the canonical address below.
+  3. Cover: write a drawing in tools/covers.py and register it in COVERS, change NAME in the cover marker
+     to that key, then run  python tools/inline_art.py  (or delete the whole pj-cover block).
+  4. On the home page, point the project's "View project" link to  project/your-project-name/
+  Images go in an img/ folder next to this file. Delete any section you don't need.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Project title] · Erdizah Ghodi Al Haidar</title>
+<meta name="description" content="[One sentence on what the project is and what it achieved]">
+<link rel="canonical" href="https://erdizah.my.id/project/[your-project-name]/">
+<meta name="theme-color" content="#05070A">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wght@400..700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/chrome.css">
+<link rel="stylesheet" href="../../css/sections.css">
+<link rel="stylesheet" href="../../css/work.css">
+<link rel="stylesheet" href="../../css/project.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to content</a>
+<div class="cursor" aria-hidden="true"><div class="cursor-scale"><div class="cursor-dir"><div class="cursor-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+
+<header class="site-head has-back">
+  <a class="back" href="../../#work"><span class="back-mark" aria-hidden="true"></span>All work</a>
+  <div class="head-right">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+    <span class="menu-label">Menu</span>
+    <span class="menu-icon" aria-hidden="true"><span class="menu-cube"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="menu-x"></span></span>
+  </button>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu-inner">
+    <nav aria-label="Sections">
+      <ul class="menu-list">
+        <li><a href="../../#about"><span class="menu-word">About</span></a></li>
+        <li><a href="../../#experience"><span class="menu-word">Experience</span></a></li>
+        <li><a href="../../#work"><span class="menu-word">Work</span></a></li>
+        <li><a href="../../#skills"><span class="menu-word">Skills</span></a></li>
+        <li><a href="../../#contact"><span class="menu-word">Contact</span></a></li>
+      </ul>
+    </nav>
+    <p class="menu-foot">Erdizah Ghodi Al Haidar, Computer Science, Universitas Gadjah Mada</p>
+  </div>
+</div>
+
+<main>
+  <section class="section pj-hero" aria-labelledby="pj-title">
+    <div class="wrap">
+      <p class="pj-kicker">[Course, team or client] &middot; [Year]</p>
+      <header class="sec-head">
+        <h1 id="pj-title">[Project title]</h1>
+      </header>
+      <div class="pj-hero-grid">
+        <div data-reveal>
+          <p class="pj-lede">[Two or three sentences: what it is, who it is for, and the approach.]</p>
+          <dl class="facts">
+            <dt>My part</dt><dd>[What you did]</dd>
+            <dt>Team</dt><dd>[Who you worked with, or remove this row]</dd>
+            <dt>Stack</dt><dd>[Languages, libraries, hardware]</dd>
+          </dl>
+          <ul class="social" aria-label="Project links">
+            <li><a class="soc" href="[link to code, demo or paper]">Source code</a></li>
+          </ul>
+        </div>
+        <div class="pj-cover" data-reveal>
+          <div class="cover" aria-hidden="true"><div class="stack"><!--cover:NAME--><!--/cover:NAME--></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="overview-title">Overview</h2>
+      </header>
+      <ul class="pj-stats">
+        <li class="pj-stat" data-reveal><strong>[Number]</strong><span>[what it counts]</span></li>
+        <li class="pj-stat" data-reveal><strong>[Number]</strong><span>[what it counts]</span></li>
+        <li class="pj-stat" data-reveal><strong>[Number]</strong><span>[what it counts]</span></li>
+      </ul>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>[The problem and why it matters.]</p>
+          <p>[What you set out to build.]</p>
+        </div>
+        <p class="pj-aside">[An optional side note, or remove this paragraph.]</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pipeline" aria-labelledby="pipeline-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="pipeline-title">[How it works]</h2>
+      </header>
+      <!-- one <li> per step; they number themselves -->
+      <ol class="pj-steps">
+        <li class="pj-step" data-reveal><h3>[Step]</h3><p>[What happens in this step.]</p></li>
+        <li class="pj-step" data-reveal><h3>[Step]</h3><p>[What happens in this step.]</p></li>
+        <li class="pj-step" data-reveal><h3>[Step]</h3><p>[What happens in this step.]</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="results-title">Results</h2>
+      </header>
+      <!-- one row per run. --v is the value as a fraction of the full bar (0 to 1); the bar starts at zero.
+           Give the run you want to point at class="is-best": it is the only one drawn in orange. -->
+      <table class="pj-bars" data-reveal>
+        <caption>[What was measured, on what data.]</caption>
+        <thead>
+          <tr><th scope="col">[Method]</th><th scope="col" class="acc">[Metric]</th><th scope="col" class="num">[Extra metric]</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">[Baseline]</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.80"></span><span class="pj-val">[80%]</span></span></td><td class="num">[0.00]</td></tr>
+          <tr class="is-best"><th scope="row">[Yours]</th><td class="acc"><span class="pj-track"><span class="pj-bar" style="--v:.90"></span><span class="pj-val">[90%]</span></span></td><td class="num">[0.00]</td></tr>
+        </tbody>
+      </table>
+
+      <!-- images live in ./img/; three per strip -->
+      <div class="pj-figs">
+        <figure class="pj-fig" data-reveal>
+          <div class="pj-strip">
+            <figure><img src="img/[first].webp" alt="[what the image shows]" width="384" height="384" loading="lazy"><figcaption>[Label]</figcaption></figure>
+            <figure><img src="img/[second].webp" alt="[what the image shows]" width="384" height="384" loading="lazy"><figcaption>[Label]</figcaption></figure>
+            <figure><img src="img/[third].webp" alt="[what the image shows]" width="384" height="384" loading="lazy"><figcaption>[Label]</figcaption></figure>
+          </div>
+          <figcaption><strong>[Short title.]</strong> [What the reader should notice.]</figcaption>
+        </figure>
+      </div>
+
+      <footer class="pj-foot">
+        <ul class="social" aria-label="More">
+          <li><a class="soc" href="../../#work">All work</a></li>
+          <li><a class="soc" href="[link to code, demo or paper]">Source code</a></li>
+        </ul>
+        <p>&copy; 2026 Erdizah Ghodi Al Haidar</p>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<script src="../../js/util.js"></script>
+<script src="../../js/selection.js"></script>
+<script src="../../js/menu.js"></script>
+<script src="../../js/background.js"></script>
+<script src="../../js/reveal.js"></script>
+<script src="../../js/cursor.js"></script>
+</body>
+</html>

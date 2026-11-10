@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG pipeline on CPU and GPU · Erdizah Ghodi Al Haidar</title>
+<meta name="description" content="Profiling a retrieval-augmented generation pipeline and accelerating its components with OpenMP on the CPU and CUDA on the GPU.">
+<link rel="canonical" href="https://erdizah.my.id/project/rag-cpu-gpu/">
+<meta name="theme-color" content="#05070A">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Overpass:wght@400..700&amp;family=Archivo:wght@400..700&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/chrome.css">
+<link rel="stylesheet" href="../../css/sections.css">
+<link rel="stylesheet" href="../../css/work.css">
+<link rel="stylesheet" href="../../css/project.css">
+</head>
+<body>
+<a class="skip" href="#overview">Skip to content</a>
+<div class="cursor" aria-hidden="true"><div class="cursor-scale"><div class="cursor-dir"><div class="cursor-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+
+<header class="site-head has-back">
+  <a class="back" href="../../#work"><span class="back-mark" aria-hidden="true"></span>All work</a>
+  <div class="head-right">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+    <span class="menu-label">Menu</span>
+    <span class="menu-icon" aria-hidden="true"><span class="menu-cube"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="menu-x"></span></span>
+  </button>
+  </div>
+</header>
+
+<div class="menu" id="menu">
+  <div class="menu-inner">
+    <nav aria-label="Sections">
+      <ul class="menu-list">
+        <li><a href="../../#about"><span class="menu-word">About</span></a></li>
+        <li><a href="../../#experience"><span class="menu-word">Experience</span></a></li>
+        <li><a href="../../#work"><span class="menu-word">Work</span></a></li>
+        <li><a href="../../#skills"><span class="menu-word">Skills</span></a></li>
+        <li><a href="../../#contact"><span class="menu-word">Contact</span></a></li>
+      </ul>
+    </nav>
+    <p class="menu-foot">Erdizah Ghodi Al Haidar, Computer Science, Universitas Gadjah Mada</p>
+  </div>
+</div>
+
+<main>
+  <section class="section pj-hero" aria-labelledby="pj-title">
+    <div class="wrap">
+      <p class="pj-kicker">High-Performance Computing course &middot; Team project &middot; 2026</p>
+      <header class="sec-head">
+        <h1 id="pj-title">RAG pipeline on CPU and GPU</h1>
+      </header>
+      <div class="pj-hero-grid">
+        <div data-reveal>
+          <p class="pj-lede">Measures where a retrieval-augmented generation (RAG) pipeline spends its time, then speeds up the slow parts with OpenMP on the CPU and CUDA on the GPU to see where parallelism actually pays off.</p>
+          <dl class="facts">
+            <dt>My part</dt><dd>[What you built]</dd>
+            <dt>Team</dt><dd>[Teammates, or remove this row]</dd>
+            <dt>Stack</dt><dd>OpenMP, CUDA, [language and profiler]</dd>
+          </dl>
+        </div>
+        <div class="pj-cover" data-reveal>
+          <div class="cover" aria-hidden="true"><div class="stack"><!--cover:rag--><svg class="layer" style="--i:0" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" style="fill:var(--mid)"/><g fill="none" style="stroke:var(--paper)" stroke-width="0.8"><rect x="8" y="30" width="15" height="15"/><rect x="25" y="30" width="15" height="15"/><rect x="8" y="47" width="15" height="15"/><rect x="25" y="47" width="15" height="15"/></g><g fill="none" style="stroke:var(--soft)" stroke-width="0.4"><rect x="53" y="27" width="4" height="4"/><rect x="58" y="27" width="4" height="4"/><rect x="63" y="27" width="4" height="4"/><rect x="68" y="27" width="4" height="4"/><rect x="73" y="27" width="4" height="4"/><rect x="78" y="27" width="4" height="4"/><rect x="83" y="27" width="4" height="4"/><rect x="88" y="27" width="4" height="4"/><rect x="53" y="32" width="4" height="4"/><rect x="58" y="32" width="4" height="4"/><rect x="63" y="32" width="4" height="4"/><rect x="68" y="32" width="4" height="4"/><rect x="73" y="32" width="4" height="4"/><rect x="78" y="32" width="4" height="4"/><rect x="83" y="32" width="4" height="4"/><rect x="88" y="32" width="4" height="4"/><rect x="53" y="37" width="4" height="4"/><rect x="58" y="37" width="4" height="4"/><rect x="63" y="37" width="4" height="4"/><rect x="68" y="37" width="4" height="4"/><rect x="73" y="37" width="4" height="4"/><rect x="78" y="37" width="4" height="4"/><rect x="83" y="37" width="4" height="4"/><rect x="88" y="37" width="4" height="4"/><rect x="53" y="42" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="63" y="42" width="4" height="4"/><rect x="68" y="42" width="4" height="4"/><rect x="73" y="42" width="4" height="4"/><rect x="78" y="42" width="4" height="4"/><rect x="83" y="42" width="4" height="4"/><rect x="88" y="42" width="4" height="4"/><rect x="53" y="47" width="4" height="4"/><rect x="58" y="47" width="4" height="4"/><rect x="63" y="47" width="4" height="4"/><rect x="68" y="47" width="4" height="4"/><rect x="73" y="47" width="4" height="4"/><rect x="78" y="47" width="4" height="4"/><rect x="83" y="47" width="4" height="4"/><rect x="88" y="47" width="4" height="4"/><rect x="53" y="52" width="4" height="4"/><rect x="58" y="52" width="4" height="4"/><rect x="63" y="52" width="4" height="4"/><rect x="68" y="52" width="4" height="4"/><rect x="73" y="52" width="4" height="4"/><rect x="78" y="52" width="4" height="4"/><rect x="83" y="52" width="4" height="4"/><rect x="88" y="52" width="4" height="4"/><rect x="53" y="57" width="4" height="4"/><rect x="58" y="57" width="4" height="4"/><rect x="63" y="57" width="4" height="4"/><rect x="68" y="57" width="4" height="4"/><rect x="73" y="57" width="4" height="4"/><rect x="78" y="57" width="4" height="4"/><rect x="83" y="57" width="4" height="4"/><rect x="88" y="57" width="4" height="4"/><rect x="53" y="62" width="4" height="4"/><rect x="58" y="62" width="4" height="4"/><rect x="63" y="62" width="4" height="4"/><rect x="68" y="62" width="4" height="4"/><rect x="73" y="62" width="4" height="4"/><rect x="78" y="62" width="4" height="4"/><rect x="83" y="62" width="4" height="4"/><rect x="88" y="62" width="4" height="4"/></g><g font-size="5" font-family="Archivo, sans-serif" style="fill:var(--paper)"><text x="8" y="76">CPU</text><text x="53" y="76">GPU</text></g></svg><svg class="layer" style="--i:1" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><g style="fill:var(--paper)"><rect x="8" y="30" width="15" height="15"/><rect x="25" y="30" width="15" height="15"/></g><g style="fill:var(--ink)"><rect x="53" y="27" width="4" height="4"/><rect x="58" y="27" width="4" height="4"/><rect x="63" y="27" width="4" height="4"/><rect x="68" y="27" width="4" height="4"/><rect x="73" y="27" width="4" height="4"/><rect x="78" y="27" width="4" height="4"/><rect x="83" y="27" width="4" height="4"/><rect x="88" y="27" width="4" height="4"/><rect x="53" y="32" width="4" height="4"/><rect x="58" y="32" width="4" height="4"/><rect x="63" y="32" width="4" height="4"/><rect x="68" y="32" width="4" height="4"/><rect x="73" y="32" width="4" height="4"/><rect x="78" y="32" width="4" height="4"/><rect x="83" y="32" width="4" height="4"/><rect x="88" y="32" width="4" height="4"/><rect x="53" y="37" width="4" height="4"/><rect x="58" y="37" width="4" height="4"/><rect x="63" y="37" width="4" height="4"/><rect x="68" y="37" width="4" height="4"/><rect x="73" y="37" width="4" height="4"/><rect x="78" y="37" width="4" height="4"/><rect x="83" y="37" width="4" height="4"/><rect x="88" y="37" width="4" height="4"/><rect x="53" y="42" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="63" y="42" width="4" height="4"/><rect x="68" y="42" width="4" height="4"/><rect x="73" y="42" width="4" height="4"/><rect x="78" y="42" width="4" height="4"/><rect x="83" y="42" width="4" height="4"/><rect x="88" y="42" width="4" height="4"/><rect x="53" y="47" width="4" height="4"/><rect x="58" y="47" width="4" height="4"/><rect x="63" y="47" width="4" height="4"/><rect x="68" y="47" width="4" height="4"/><rect x="73" y="47" width="4" height="4"/><rect x="78" y="47" width="4" height="4"/><rect x="83" y="47" width="4" height="4"/><rect x="88" y="47" width="4" height="4"/><rect x="53" y="52" width="4" height="4"/><rect x="58" y="52" width="4" height="4"/><rect x="63" y="52" width="4" height="4"/><rect x="68" y="52" width="4" height="4"/><rect x="73" y="52" width="4" height="4"/><rect x="78" y="52" width="4" height="4"/><rect x="83" y="52" width="4" height="4"/><rect x="88" y="52" width="4" height="4"/><rect x="53" y="57" width="4" height="4"/><rect x="58" y="57" width="4" height="4"/><rect x="63" y="57" width="4" height="4"/><rect x="68" y="57" width="4" height="4"/><rect x="73" y="57" width="4" height="4"/><rect x="78" y="57" width="4" height="4"/><rect x="83" y="57" width="4" height="4"/><rect x="88" y="57" width="4" height="4"/><rect x="53" y="62" width="4" height="4"/><rect x="58" y="62" width="4" height="4"/><rect x="63" y="62" width="4" height="4"/><rect x="68" y="62" width="4" height="4"/><rect x="73" y="62" width="4" height="4"/><rect x="78" y="62" width="4" height="4"/><rect x="83" y="62" width="4" height="4"/><rect x="88" y="62" width="4" height="4"/></g></svg><svg class="layer" style="--i:2" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M40 46H51" fill="none" style="stroke:var(--acc-d)" stroke-width="1.2"/><g style="fill:var(--acc-fill)"><rect x="53" y="37" width="4" height="4"/><rect x="58" y="37" width="4" height="4"/><rect x="63" y="37" width="4" height="4"/><rect x="68" y="37" width="4" height="4"/><rect x="73" y="37" width="4" height="4"/><rect x="78" y="37" width="4" height="4"/><rect x="83" y="37" width="4" height="4"/><rect x="88" y="37" width="4" height="4"/><rect x="53" y="42" width="4" height="4"/><rect x="58" y="42" width="4" height="4"/><rect x="63" y="42" width="4" height="4"/><rect x="68" y="42" width="4" height="4"/><rect x="73" y="42" width="4" height="4"/><rect x="78" y="42" width="4" height="4"/><rect x="83" y="42" width="4" height="4"/><rect x="88" y="42" width="4" height="4"/><rect x="53" y="47" width="4" height="4"/><rect x="58" y="47" width="4" height="4"/><rect x="63" y="47" width="4" height="4"/><rect x="68" y="47" width="4" height="4"/><rect x="73" y="47" width="4" height="4"/><rect x="78" y="47" width="4" height="4"/><rect x="83" y="47" width="4" height="4"/><rect x="88" y="47" width="4" height="4"/><rect x="53" y="52" width="4" height="4"/><rect x="58" y="52" width="4" height="4"/><rect x="63" y="52" width="4" height="4"/><rect x="68" y="52" width="4" height="4"/><rect x="73" y="52" width="4" height="4"/><rect x="78" y="52" width="4" height="4"/><rect x="83" y="52" width="4" height="4"/><rect x="88" y="52" width="4" height="4"/></g></svg><!--/cover:rag--></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="overview-title">Overview</h2>
+      </header>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>A RAG system answers a question in stages: it turns the question into a vector, searches a store of documents for the closest passages, and hands them to a language model to write the answer. Each stage is a different kind of work, so each gains differently from parallel hardware.</p>
+          <p>Instead of assuming the GPU wins everywhere, the project measures each component first and accelerates only where the numbers point.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="method" aria-labelledby="method-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="method-title">Method</h2>
+      </header>
+      <ol class="pj-steps">
+        <li class="pj-step" data-reveal><h3>Profile end to end</h3><p>Time every component of the pipeline to find where the time actually goes.</p></li>
+        <li class="pj-step" data-reveal><h3>Parallelise on the CPU</h3><p>Rewrite the heavy components with OpenMP across cores.</p></li>
+        <li class="pj-step" data-reveal><h3>Move to the GPU</h3><p>Port the same components to CUDA and run them on the graphics card.</p></li>
+        <li class="pj-step" data-reveal><h3>Compare honestly</h3><p>Measure the speed-up of each version against the original, component by component.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="results-title">Results</h2>
+      </header>
+      <div class="pj-copy" data-reveal>
+        <div>
+          <p>[Speed-ups per component once the measurements are in. The results table on the TB page shows the format: one row per version, the best in orange.]</p>
+        </div>
+      </div>
+
+      <footer class="pj-foot">
+        <ul class="social" aria-label="More">
+          <li><a class="soc" href="../../#work">All work</a></li>
+        </ul>
+        <p>&copy; 2026 Erdizah Ghodi Al Haidar</p>
+      </footer>
+    </div>
+  </section>
+</main>
+
+<script src="../../js/util.js"></script>
+<script src="../../js/selection.js"></script>
+<script src="../../js/menu.js"></script>
+<script src="../../js/background.js"></script>
+<script src="../../js/reveal.js"></script>
+<script src="../../js/cursor.js"></script>
+</body>
+</html>

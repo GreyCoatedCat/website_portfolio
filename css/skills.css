@@ -1,0 +1,75 @@
+/* Skills and certifications: pattern legend, skill tiles, certifications and competitions. */
+
+/* Skills */
+.pat { --pc: var(--text); }
+.pat-lang { background: var(--pc); }
+.pat-ml { background: repeating-linear-gradient(45deg, var(--pc) 0 3px, transparent 3px 8px); }
+.pat-sys { background: linear-gradient(var(--pc) 1.5px, transparent 1.5px) 0 0 / 8px 8px, linear-gradient(90deg, var(--pc) 1.5px, transparent 1.5px) 0 0 / 8px 8px; }
+.pat-app { background: radial-gradient(var(--pc) 1.8px, transparent 2.2px) 0 0 / 8px 8px; }
+.legend { list-style: none; margin: 0 0 36px; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 30px; }
+.legend li { display: flex; align-items: center; gap: 10px; font-family: var(--label); font-size: .92rem; font-weight: 600; }
+.legend .pat { width: 24px; height: 24px; border: 1.5px solid var(--text); }
+.skill-groups { display: grid; gap: 36px; }
+.skill-group {
+  display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 16px 32px; align-items: start;
+  padding-top: 20px; border-top: 1.5px solid var(--line-strong);
+}
+.skill-group h3 {
+  margin: 0; font-family: var(--display); font-weight: 600; letter-spacing: -.01em; font-size: 1.2rem; line-height: 1.15;
+}
+.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.skill {
+  aspect-ratio: 1; display: grid; grid-template-rows: 38% minmax(0, 1fr);
+  border: 1.5px solid var(--line-strong); background: var(--bg-2);
+  transition: background-color .2s, color .2s;
+}
+.skill { transform: perspective(2200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+.skill .pat { border-bottom: 1.5px solid var(--line-strong); transition: background-position .6s; }
+.skill-text { display: grid; gap: 4px; align-content: start; padding: 10px 12px 12px; }
+.skill strong {
+  font-family: var(--display); font-weight: 600; letter-spacing: -.01em; font-size: 1.05rem; line-height: 1.1;
+}
+.skill-text span { font-family: var(--label); font-size: .82rem; line-height: 1.3; color: var(--muted); }
+.skill:hover { background: var(--text); color: var(--bg); border-color: var(--bg); }
+.skill:hover .pat { --pc: var(--bg); background-position: 8px 8px; }
+.skill:hover .skill-text span { color: #4A5866; }
+.creds { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 48px clamp(32px, 5vw, 72px); margin-top: clamp(72px, 9vw, 120px); }
+.cred-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--line-strong); }
+.cred-list li {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; align-items: center;
+  padding: 16px 0; border-bottom: 1.5px solid var(--line-strong);
+}
+.cred-list li.has-badge { grid-template-columns: 92px minmax(0, 1fr) auto; padding: 22px 0 26px; }
+.cred-badge {
+  position: relative; width: 64px; height: 64px; margin: 4px 0 0 2px;
+  display: grid; place-items: center;
+  background: var(--bg);
+  border: 1.5px solid var(--line-strong);
+  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2F4256, 3px 3px 0 #2D4053, 4px 4px 0 #2B3D50, 5px 5px 0 #293A4D, 6px 6px 0 #27384A, 7px 7px 0 #253547, 8px 8px 0 #233344, 9px 9px 0 rgba(233, 228, 216, .22);
+}
+.cred-badge svg { display: block; width: 40px; height: 40px; }
+.cred-badge::before, .cred-badge::after { content: ""; position: absolute; pointer-events: none; }
+.cred-badge::before {
+  width: 13px; height: 13px; top: -7px; right: -15px; background: var(--accent);
+  box-shadow: 1px 1px 0 #D9531C, 2px 2px 0 #C24817, 3px 3px 0 #A93E13, 4px 4px 0 #8F3410;
+}
+.cred-badge::after {
+  width: 9px; height: 9px; bottom: -20px; right: -18px; background: var(--paper-hi);
+  box-shadow: 1px 1px 0 #A9A292, 2px 2px 0 #8E8879, 3px 3px 0 #757063;
+}
+.cred-list strong { display: block; font-weight: 700; line-height: 1.3; }
+.cred-list .cred-sub { display: block; color: var(--muted); font-family: var(--label); font-size: .92rem; line-height: 1.4; }
+.cred-year { font-family: var(--label); font-size: .92rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .skill-group { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cred-list li { grid-template-columns: 40px minmax(0, 1fr); }
+  .cred-list li.has-badge { grid-template-columns: 88px minmax(0, 1fr); }
+  .cred-year { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill, .skill .pat { transition: none; }
+}
