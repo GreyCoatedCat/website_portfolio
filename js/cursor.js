@@ -5,8 +5,9 @@
   const hero = document.querySelector('.hero');
 
   /* ---------- Cursor cube ----------
-     Follows the pointer on a spring. While it moves it stretches into a beam along its path,
-     thinner as it gets longer, and springs back into a cube when the pointer stops.
+     While the pointer moves, a wireframe cube follows it and the solid cube stays where it last rested.
+     Once the pointer has been still for a moment, the solid cube stretches out to it as a beam, its tail
+     catches up, and it closes back into a cube inside the wireframe, which fades.
      Over a menu item it docks onto the item as a level block.
      Over a work cover or a skill tile it slides in behind the card and becomes the body of a
      cube whose front face is the card: the card tips toward the pointer and the cube's sides
@@ -20,8 +21,17 @@
   const C = {
     tx: 0, ty: 0, x: 0, y: 0, px: 0, py: 0,
     k: 1, kv: 0, sx: 1, sy: 1, sz: 1, a: -28, b: 40, th: 0, tz: 0,
-    dock: null, back: false, raf: 0, last: 0, on: false,
+    dock: null, back: false, raf: 0, last: 0, on: false, moveT: 0, anim: null,
   };
+  const REST = 240; // ms the pointer must stay still before the cube moves
+  // the wireframe that trails the pointer
+  const wire = document.createElement('div');
+  wire.className = 'cursor-wire'; wire.setAttribute('aria-hidden', 'true');
+  wire.innerHTML = '<div class="cursor-wire-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+  cursor.after(wire);
+  const wireCube = wire.firstChild;
+  const W = { x: 0, y: 0, op: 0, r: 40 };
+  const io = s => (s < 0.5 ? 4 * s * s * s : 1 - Math.pow(-2 * s + 2, 3) / 2);
   // Text links get a block hugging their words; the mark and buttons get covered exactly;
   // cards get a cube body exactly their size, as deep as they are wide.
   function dockRect(el) {
@@ -89,27 +99,50 @@
       const t0 = TILT.get(C.dock), sg = Math.cos(gth) >= 0 ? 1 : -1;
       ga = t0.rx * sg; gb = t0.ry * sg;
     }
-    const kp = reduceMQ.matches ? 1 : ease(docked ? 18 : 12);
-    C.x += (gx - C.x) * kp; C.y += (gy - C.y) * kp;
-    const vx = (C.x - C.px) / dt, vy = (C.y - C.py) / dt;
-    C.px = C.x; C.py = C.y;
-    if (!docked) {
-      const speed = Math.hypot(vx, vy);
-      const goal = reduceMQ.matches ? 1 : 1 + clamp(speed / 500, 0, 3);
-      // a spring, so the beam overshoots a little and squashes when it stops
-      C.kv += ((goal - C.k) * 260 - C.kv * 19) * dt;
-      C.k = Math.max(0.6, C.k + C.kv * dt);
-      if (speed > 40) {
-        let d = Math.atan2(vy, vx) - C.th;
-        d = ((((d + Math.PI / 2) % Math.PI) + Math.PI) % Math.PI) - Math.PI / 2; // a beam looks the same both ways round
-        C.th += d * ease(14);
+    const free = !docked && !reduceMQ.matches, clock = performance.now();
+    let beam = false;
+    if (docked || !free) {
+      C.anim = null;
+      const kp = reduceMQ.matches && !docked ? 1 : ease(docked ? 18 : 12);
+      C.x += (gx - C.x) * kp; C.y += (gy - C.y) * kp;
+      if (!docked) { gsx = gsy = gsz = 1; ga = -28; gb = 40; }
+    } else {
+      // the pointer has rested away from the cube: stretch across to it
+      const far = Math.hypot(C.tx - C.x, C.ty - C.y);
+      if (!C.anim && far > 3 && clock - C.moveT > REST) {
+        C.anim = { x0: C.x, y0: C.y, x1: C.tx, y1: C.ty, t0: clock, dur: clamp(240 + far * 0.45, 300, 620) };
       }
-      gsx = C.k; gsy = gsz = 1 / Math.sqrt(C.k);
-      ga = -28; gb = 40 / C.k;
+      if (C.anim) {
+        const A = C.anim, p = clamp((clock - A.t0) / A.dur, 0, 1);
+        // the head reaches out first, then the tail follows it in
+        const hd = io(clamp(p / 0.55, 0, 1)), tl = io(clamp((p - 0.45) / 0.55, 0, 1));
+        const dx = A.x1 - A.x0, dy = A.y1 - A.y0, len = Math.hypot(dx, dy) * (hd - tl), k = 1 + len / UNIT;
+        C.x = A.x0 + dx * (hd + tl) / 2; C.y = A.y0 + dy * (hd + tl) / 2;
+        C.sx = k; C.sy = C.sz = Math.max(0.5, Math.pow(k, -0.25)); C.k = k; C.kv = 0; // a block, a little slimmer as it stretches
+        C.th = Math.atan2(dy, dx); C.a = -28; C.b = 40 / k;
+        beam = true;
+        if (p >= 1) { C.anim = null; C.x = A.x1; C.y = A.y1; beam = false; }
+      }
+      // at rest it turns back to the usual three-quarter view
+      gsx = gsy = gsz = 1; ga = -28; gb = 40;
+      if (!C.anim) { gth = Math.round(C.th / Math.PI) * Math.PI; C.th += (gth - C.th) * ease(12); }
+      gx = C.x; gy = C.y;
     }
-    const km = ease(docked ? 16 : 30), ka = body ? ease(40) : km;
-    C.sx += (gsx - C.sx) * km; C.sy += (gsy - C.sy) * km; C.sz += (gsz - C.sz) * km;
-    C.a += (ga - C.a) * ka; C.b += (gb - C.b) * ka; C.tz += (gtz - C.tz) * km;
+    C.px = C.x; C.py = C.y;
+    if (!beam) {
+      const km = ease(docked ? 16 : 30), ka = body ? ease(40) : km;
+      C.sx += (gsx - C.sx) * km; C.sy += (gsy - C.sy) * km; C.sz += (gsz - C.sz) * km;
+      C.a += (ga - C.a) * ka; C.b += (gb - C.b) * ka; C.tz += (gtz - C.tz) * km;
+    }
+    // the wireframe: close on the pointer, shown while the solid cube is elsewhere or on its way
+    const showWire = free && C.on && !cursorHidden && (!!C.anim || Math.hypot(C.tx - C.x, C.ty - C.y) > 3);
+    W.op += ((showWire ? 1 : 0) - W.op) * ease(showWire ? 20 : 9);
+    const kw = ease(30);
+    W.x += (C.tx - W.x) * kw; W.y += (C.ty - W.y) * kw;
+    if (W.op > 0.01) W.r += dt * 50;
+    wire.style.opacity = W.op.toFixed(3);
+    wire.style.transform = 'translate3d(' + W.x.toFixed(1) + 'px,' + W.y.toFixed(1) + 'px,0)';
+    wireCube.style.transform = 'rotateX(-28deg) rotateY(' + W.r.toFixed(1) + 'deg)';
     cursor.style.transform = 'translate3d(' + C.x.toFixed(1) + 'px,' + C.y.toFixed(1) + 'px,0)';
     cursorDir.style.transform = 'rotateZ(' + C.th.toFixed(4) + 'rad)';
     cursorCube.style.transform = 'rotateX(' + C.a.toFixed(2) + 'deg) rotateY(' + C.b.toFixed(2) + 'deg) translateZ(' +
@@ -117,7 +150,8 @@
     const settled = !tiltBusy && Math.abs(gx - C.x) < 0.15 && Math.abs(gy - C.y) < 0.15 &&
       Math.abs(gsx - C.sx) < 0.003 && Math.abs(gsy - C.sy) < 0.003 && Math.abs(gsz - C.sz) < 0.003 &&
       Math.abs(ga - C.a) < 0.05 && Math.abs(gb - C.b) < 0.05 && Math.abs(gth - C.th) < 0.001 &&
-      Math.abs(gtz - C.tz) < 0.05 && Math.abs(C.kv) < 0.01 && (docked || Math.abs(C.k - 1) < 0.002);
+      Math.abs(gtz - C.tz) < 0.05 && Math.abs(C.kv) < 0.01 && (docked || Math.abs(C.k - 1) < 0.002) &&
+      !C.anim && W.op < 0.01 && (!free || Math.hypot(C.tx - C.x, C.ty - C.y) <= 3);
     C.raf = settled || !C.on ? 0 : requestAnimationFrame(cursorTick);
   }
   function kickCursor() { if (C.on && !C.raf) { C.last = 0; C.raf = requestAnimationFrame(cursorTick); } }
@@ -133,9 +167,10 @@
       if (!hide) {
         C.x = C.px = C.tx; C.y = C.py = C.ty;
         C.k = 1; C.kv = 0; C.sx = C.sy = C.sz = 1; C.th = 0; C.tz = 0; C.a = -28; C.b = 40;
+        C.anim = null; W.x = C.tx; W.y = C.ty; W.op = 0;
       }
     }
-    if (hide) { C.dock = null; C.back = false; cursor.classList.remove('is-dock', 'is-back'); }
+    if (hide) { C.dock = null; C.back = false; C.anim = null; W.op = 0; wire.style.opacity = '0'; cursor.classList.remove('is-dock', 'is-back'); }
     kickCursor();
     return hide;
   }
@@ -144,8 +179,8 @@
     document.documentElement.classList.add('has-cursor');
     window.addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
-      C.tx = e.clientX; C.ty = e.clientY;
-      if (!C.on) { C.on = true; C.x = C.px = C.tx; C.y = C.py = C.ty; cursor.classList.add('is-on'); }
+      C.tx = e.clientX; C.ty = e.clientY; C.moveT = performance.now();
+      if (!C.on) { C.on = true; C.x = C.px = C.tx; C.y = C.py = C.ty; W.x = C.tx; W.y = C.ty; cursor.classList.add('is-on'); }
       if (updateZone()) return;
       const el = e.target && e.target.closest ? e.target : null;
       const dock = el ? el.closest(DOCK) : null;
@@ -158,7 +193,7 @@
     // keep a docked block on its item while the page scrolls underneath
     window.addEventListener('scroll', () => { if (C.on) updateZone(); if (C.dock) kickCursor(); }, { passive: true });
     document.documentElement.addEventListener('mouseleave', () => {
-      C.on = false; C.dock = null; C.back = false;
+      C.on = false; C.dock = null; C.back = false; C.anim = null; W.op = 0; wire.style.opacity = '0';
       cursor.classList.remove('is-on', 'is-dock', 'is-back');
       for (const [el] of TILT) { el.style.removeProperty('--rx'); el.style.removeProperty('--ry'); el.classList.remove('is-lifted'); }
       TILT.clear();

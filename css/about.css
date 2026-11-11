@@ -20,15 +20,15 @@
 }
 .face-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .face span {
-  position: relative; background: #05070A; color: #E9E4D8;
+  position: relative; background: #120D11; color: #F1E6D6;
   padding: 5px 9px 3px; font-family: var(--label); font-weight: 700; font-size: .88rem; line-height: 1.2;
 }
-.f1 { transform: rotateY(0deg) translateZ(calc(var(--s) / 2)); background: #FF6A2B; }
-.f2 { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); background: #E9E4D8; }
-.f3 { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); background: #3E5468; }
-.f4 { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); background: #121A24; }
-.f5 { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background: #D6CEBB; }
-.f6 { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); background: #05070A; }
+.f1 { transform: rotateY(0deg) translateZ(calc(var(--s) / 2)); background: #5B86C4; }
+.f2 { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); background: #F1E6D6; }
+.f3 { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); background: #945C48; }
+.f4 { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); background: #C24E38; }
+.f5 { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); background: #D98A48; }
+.f6 { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); background: #120D11; }
 .cube-note { margin: 0; color: var(--muted); font-family: var(--label); font-size: .9rem; }
 
 @media (max-width: 860px) {

@@ -21,7 +21,7 @@
 .city-wrap { display: grid; gap: 12px; width: 100%; }
 .city {
   position: relative; aspect-ratio: 1; width: 100%;
-  background: radial-gradient(circle at 50% 45%, #141C27 0%, var(--void) 70%);
+  background: radial-gradient(circle at 50% 45%, #2A1C22 0%, var(--void) 70%);
   box-shadow: 0 0 0 1px var(--line-strong);
   cursor: grab; touch-action: pan-y; user-select: none;
 }

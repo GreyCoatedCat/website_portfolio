@@ -45,7 +45,7 @@
   position: fixed; inset: 0; z-index: 34;
   display: grid; align-content: safe center; overflow-y: auto;
   padding: 96px var(--gutter) 48px;
-  background: rgba(5, 7, 10, .9);
+  background: rgba(18, 13, 17, .92);
   -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   opacity: 0; visibility: hidden;
   transition: opacity .3s, visibility 0s linear .3s;
@@ -106,7 +106,23 @@
 .cursor-cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(11px); background: #b8b8b8; }
 .cursor-cube i:nth-child(5) { transform: rotateX(90deg) translateZ(11px); background: #7c7c7c; }
 .cursor-cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(11px); background: #7c7c7c; }
-@media (hover: none), (pointer: coarse) { .cursor { display: none; } }
+/* the wireframe that trails the pointer while the solid cube waits */
+.cursor-wire {
+  position: fixed; left: 0; top: 0; z-index: 25; width: 0; height: 0;
+  pointer-events: none; mix-blend-mode: difference; opacity: 0; perspective: 700px;
+}
+.cursor-wire-cube {
+  position: absolute; left: -11px; top: -11px; width: 22px; height: 22px;
+  transform-style: preserve-3d; transform: rotateX(-28deg) rotateY(40deg);
+}
+.cursor-wire-cube i { position: absolute; inset: 0; border: 1.5px solid #fff; }
+.cursor-wire-cube i:nth-child(1) { transform: translateZ(11px); }
+.cursor-wire-cube i:nth-child(2) { transform: rotateY(180deg) translateZ(11px); }
+.cursor-wire-cube i:nth-child(3) { transform: rotateY(90deg) translateZ(11px); }
+.cursor-wire-cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(11px); }
+.cursor-wire-cube i:nth-child(5) { transform: rotateX(90deg) translateZ(11px); }
+.cursor-wire-cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(11px); }
+@media (hover: none), (pointer: coarse) { .cursor, .cursor-wire { display: none; } }
 /* These sit one layer above the cursor, so the cube slips behind them. */
 .cover, .cube-scene, .skill, .city { position: relative; z-index: 30; }
 

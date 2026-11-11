@@ -30,7 +30,7 @@ css/
 js/
   util.js                     shared helpers and state (window.Portfolio); must load first
   menu.js                     the menu overlay, on every page
-  selection.js                selected text: the orange highlight that sweeps in, on every page
+  selection.js                selected text: the amber highlight that sweeps in, on every page
   corridor.js                 the opening corridor renderer and the jumper (home)
   city.js                     the block city renderer (home)
   main.js                     home page controller: scenes, opening shot, hero name and scroll, picking up the
@@ -95,7 +95,7 @@ custom-domain settings.
   the Experience entries, the More projects links (`href="#"`), the certificate links for the competitions, the
   competition name for TELITI and the year of the AWS certification. On the project pages: your part where it
   is marked, and the results and screenshots of the projects still in progress.
-- **Work tiles**: a tile's cover turns orange on hover and opens the project when its "View project" link points
+- **Work tiles**: a tile's cover turns amber on hover and opens the project when its "View project" link points
   to a page; a tile whose link is still `#` stays as it is.
 - **Colours and fonts** are tokens at the top of `css/base.css`. The canvas scenes keep their own palettes:
   `THEME` in `js/corridor.js` and `CITY_MAT` in `js/city.js`.

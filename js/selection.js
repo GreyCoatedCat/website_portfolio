@@ -1,8 +1,8 @@
 /* Selected text in the accent colour, drawn in rather than switched on. The highlight sweeps from where the
    selection started toward where it ends, and while dragging it trails the pointer with a short ease, the way
    the cursor cube follows the mouse. Uses the CSS Custom Highlight API: the native selection stays (copying
-   works as usual) but is made transparent, and this script paints the orange over the part swept so far.
-   Browsers without the API keep the plain orange ::selection from base.css. */
+   works as usual) but is made transparent, and this script paints the accent colour over the part swept so far.
+   Browsers without the API keep the plain accent-coloured ::selection from base.css. */
 (() => {
   'use strict';
   if (!(window.CSS && CSS.highlights && window.Highlight && window.StaticRange)) return;

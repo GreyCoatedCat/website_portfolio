@@ -8,19 +8,35 @@
 
   // Opening shot, in seconds from the moment the loading screen lifts
   const INTRO = { dolly: 5.6, back: 1.8, light: 0.12, reveal: 3.2, pop: 2.6, end: 6.2 };
-  const CHIPS = ['#FF6A2B', '#E9E4D8', '#7F9BB5'];
+  const CHIPS = ['#D9693A', '#E9A85A', '#2F589A'];
 
 
+  // A Japanese street at night, taken from the reference painting: dark wood and plum shadows, slate blue,
+  // lantern red and orange, paper windows lit amber, olive leaves, and a warm light at the far end.
   const THEME = {
-    dark: ['#0D121A', '#141C27', '#0A0D12'],
-    light: ['#3A4859', '#4A5B70', '#D6CEBB'],
-    accent: ['#FF6A2B', '#F2B544', '#7F93A3'],
-    box: ['#5A6B80', '#D6CEBB', '#2B3646', '#7F93A3', '#FF6A2B'],
-    cube: ['#D6CEBB', '#7F93A3'], wire: ['#F2B544', '#D6CEBB'],
-    lo: '#0D121A', hi: '#D6CEBB',
-    haze: '#3A1C0E', glowCore: '255,222,170', glow: '255,106,43',
-    char: ['#7F9BB5', '#0D121A', '#E9E4D8'],
+    dark: ['#201F29', '#302125', '#1F181E'],
+    light: ['#52312F', '#2E4057', '#945C48'],
+    accent: ['#D98A48', '#C24E38', '#4E5E31'],
+    box: ['#3D2C2E', '#7F4639', '#2E4057', '#52312F', '#945C48', '#212D3F'],
+    cube: ['#D9693A', '#E9A85A'], wire: ['#B98A5C', '#D98A48'],
+    lo: '#1F181E', hi: '#B98A5C',
+    haze: '#26171B', glowCore: '242,196,140', glow: '212,118,58',
+    char: ['#5B86C4', '#1F181E', '#FFF4E0'],
+    // paper windows: lit, and the dark wooden lattice over them; unlit panes
+    paper: '#D98A48', lattice: '#3E2214', pane: '#1A1420',
+    // the river: deep night blue, and the koi that jump out of it
+    water: ['#1A2E52', '#1D3359', '#172A4B'], koi: '#F1E6D6', koiRed: '#C9472F', koiFin: '#E07A45',
   };
+  // A soft round glow, drawn onto a quarter-size layer that is laid over the scene once per frame.
+  function glowSprite(r, g, b) {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',.55)');
+    gr.addColorStop(0.4, 'rgba(' + r + ',' + g + ',' + b + ',.22)');
+    gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+    return c;
+  }
   // The light sits at the far end; walls facing it differently pick up different amounts: ceiling, right, floor, left.
   const WALL = [0.6, 0.82, 1.0, 0.72];
   const EDGES = [];
@@ -37,7 +53,7 @@
         seg: 0.34, near: 0.05, far: 16, fov: 0.62, vp: [0.5, 0.5],
         accentP: 0.1, patternP: 0.3, boxP: 0.52, cubes: 22, ribEvery: 7,
         glowSize: 0.5, roll: 0, speed: 0.38, seed: 1, scrollDepth: 3.5,
-        lightNear: 0.36, vignette: false, jumper: false, intro: false,
+        lightNear: 0.46, vignette: false, jumper: false, intro: false,
       }, opts);
       const o = this.o, T = this.t = {};
       // quality: 0 full, 1 lighter, 2 lightest. Phones start at 1; any device steps down if frames run long.
@@ -46,6 +62,12 @@
       for (const k of ['dark', 'light', 'accent', 'box', 'cube', 'wire']) T[k] = THEME[k].map(hex);
       T.lo = hex(THEME.lo); T.hi = hex(THEME.hi); T.haze = hex(THEME.haze);
       T.char = THEME.char.map(hex);
+      for (const k of ['paper', 'lattice', 'pane']) T[k] = hex(THEME[k]);
+      T.water = THEME.water.map(hex);
+      this.fish = []; this.splashes = []; this.nextFish = 2500;
+      this.Q = new Float64Array(8);
+      this.spr = glowSprite(226, 140, 72);
+      this.bloomC = document.createElement('canvas'); this.bctx = this.bloomC.getContext('2d');
       this.camZ = 0; this.scrollZ = 0;
       this.cx = 0; this.cy = 0; this.tx = 0; this.ty = 0;
       this.vx = 0; this.vy = 0; this.tvx = 0; this.tvy = 0;
@@ -128,6 +150,7 @@
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       this.f = Math.min(this.w, this.h) * this.o.fov;
       this.vg = null;
+      this.bloomC.width = Math.ceil(this.w / 4); this.bloomC.height = Math.ceil(this.h / 4);
       this.draw();
     }
 
@@ -151,6 +174,7 @@
       this.camZ += this.o.speed * dt;
       if (this.introT >= 0 && this.introT < 99) { this.introT += dt; if (this.introT > INTRO.end) this.introT = 99; }
       if (this.o.jumper) this.updateJumper(dt);
+      if (this.o.river) this.updateFish(dt);
     }
 
     proj(x, y, z) {
@@ -189,7 +213,8 @@
     // Boxes slowly breathe in and out of the wall and drift along it, each on its own clock.
     boxAt(k, w, i, m) {
       const o = this.o, seed = o.seed, L = o.seg, id = k * 16 + w * 4 + i;
-      if (rand(id, 30, seed) >= o.boxP) return null;
+      // fewer blocks stand in the river, so the water shows
+      if (rand(id, 30, seed) >= (w === 2 && o.river ? 0.18 : o.boxP)) return null;
       const span = 2 / m, u0 = -1 + i * span;
       const t = this.time / 1000, ph = rand(id, 33, seed) * TAU, sp = 0.25 + rand(id, 34, seed) * 0.45;
       // mostly low blocks, a few tall pillars reaching into the corridor
@@ -236,20 +261,31 @@
       const merge = rel > this.mergeFar;
       for (let w = 0; w < 4; w++) {
         const m = this.tiles(k, w), f = lf * WALL[w];
+        if (w === 2 && o.river) {
+          this.water(k, zA, zB, f, hz, rel);
+          for (let i = 0; i < m; i++) { const b = this.boxAt(k, w, i, m); if (b && rel < this.boxFar) items.push(b); }
+          continue;
+        }
         if (merge) this.poly(w, [-1, 0, zA, 1, 0, zA, 1, 0, zB, -1, 0, zB], this.shade(base, f, hz), false);
         for (let i = 0; i < m; i++) {
           const u0 = -1 + (2 * i) / m, u1 = -1 + (2 * (i + 1)) / m;
           const id = k * 16 + w * 4 + i;
           const r = rand(id, 20, seed);
           const col = r < o.accentP ? T.accent[Math.floor((r / o.accentP) * T.accent.length)] : base;
-          if (!merge || col !== base) this.poly(w, [u0, 0, zA, u1, 0, zA, u1, 0, zB, u0, 0, zB], this.shade(col, f, hz), rel < this.seamFar);
-          if (patterns && rand(id, 40, seed) < o.patternP) this.pattern(w, id, u0, u1, zS, zA, zB, col, f, hz);
+          if (col === T.accent[0]) {
+            // a lit paper panel in the wall
+            this.q4(w, [u0, 0, zA, u1, 0, zA, u1, 0, zB, u0, 0, zB]);
+            this.paneQ(true, hz, rel, 3, 2, 0.8);
+          } else {
+            if (!merge || col !== base) this.poly(w, [u0, 0, zA, u1, 0, zA, u1, 0, zB, u0, 0, zB], this.shade(col, f, hz), rel < this.seamFar);
+            if (patterns && rand(id, 40, seed) < o.patternP) this.pattern(w, id, u0, u1, zS, zA, zB, col, f, hz);
+          }
           const b = this.boxAt(k, w, i, m);
           if (b && rel < this.boxFar) items.push(b);
         }
       }
       // contact shadows go down first, so none of them lands on a neighbouring block
-      if (rel < this.shadowFar) for (const b of items) this.shadow(b, zA, zB, hz);
+      if (rel < this.shadowFar) for (const b of items) if (!(o.river && b.w === 2)) this.shadow(b, zA, zB, hz);
       // every few metres a square frame runs round all four walls, like the rings in the reference posters
       if (o.ribEvery && k % o.ribEvery === 0 && rel < o.far * 0.8 && zS + L * 0.32 > zA) items.push({ key: zS + L * 0.16, rib: true });
       if (extra) for (const it of extra) items.push(it);
@@ -258,6 +294,8 @@
       for (const it of items) {
         if (it.rib) { const r1 = zS + L * 0.32; for (let w = 0; w < 4; w++) this.slab(w, -1, 1, Math.max(zA, zS), r1, 0, 0.055, T.light[2], lf * WALL[w], hz); }
         else if (it.pose) this.drawJumper(it.pose);
+        else if (it.fish) this.drawFish(it.fish);
+        else if (it.splash) this.drawSplash(it.splash);
         else if (it.ax !== undefined) this.cube(it);
         else {
           const fade = clamp((this.boxFar - rel) / 1.4, 0, 1);
@@ -309,10 +347,15 @@
       const { a0, a1, d } = b;
       const col = T.box[Math.floor(rand(b.id, 32, seed) * T.box.length)];
       this.slab(w, a0, a1, z0, z1, 0, d, col, f, hz);
+      const rel = this.segRel, lit = rand(b.id, 60, seed) < 0.62;
+      if (this.q < 2 || rel < 7) this.windows(w, a0, a1, b.z0, z1, 0, d, zA, lit, hz, rel);
       if (b.st) {
         const sa0 = b.uc - b.hw * b.st.f, sa1 = b.uc + b.hw * b.st.f;
         const sz0b = Math.max(b.zc - b.hz * b.st.f, zA), sz1b = b.zc + b.hz * b.st.f;
-        if (sz1b > sz0b) this.slab(w, sa0, sa1, sz0b, sz1b, d, d + b.st.dd, T.box[Math.floor(rand(b.id, 53, seed) * T.box.length)], f, hz);
+        if (sz1b > sz0b) {
+          this.slab(w, sa0, sa1, sz0b, sz1b, d, d + b.st.dd, T.box[Math.floor(rand(b.id, 53, seed) * T.box.length)], f, hz);
+          if (this.q < 2) this.windows(w, sa0, sa1, b.zc - b.hz * b.st.f, sz1b, d, d + b.st.dd, zA, rand(b.id, 61, seed) < 0.55, hz, rel);
+        }
       }
     }
 
@@ -329,8 +372,166 @@
       this.pt(w, a0, d1, z1); const x0 = this.px, y0 = this.py;
       this.pt(w, a1, d1, z1);
       ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(this.px, this.py);
-      ctx.strokeStyle = css(this.shade(mix(col, [255, 220, 170], 0.5), Math.min(1.25, f * 1.25), hz));
+      ctx.strokeStyle = css(this.shade(mix(col, [232, 176, 118], 0.5), Math.min(1.25, f * 1.25), hz));
       ctx.lineWidth = 1.2; ctx.stroke();
+    }
+
+
+
+    // ---- The river along the bottom, and its koi ----
+    // Night water: a deep blue surface with broken streaks of light on it, the far glow's reflection down the middle.
+    water(k, zA, zB, f, hz, rel) {
+      const T = this.t, ctx = this.ctx, seed = this.o.seed, L = this.o.seg, zS = k * L, t = this.time / 1000;
+      this.poly(2, [-1, 0, zA, 1, 0, zA, 1, 0, zB, -1, 0, zB], this.shade(T.water[((k % 3) + 3) % 3], f, hz), rel < this.seamFar);
+      if (rel > 11) return;
+      ctx.lineWidth = clamp((this.f * 0.007) / rel, 0.8, 3);
+      ctx.strokeStyle = 'rgb(' + THEME.glow + ')';
+      for (let j = 0; j < 4; j++) {
+        const z = zS + L * (0.12 + j * 0.25);
+        if (z <= zA) continue;
+        // the middle ones mirror the light at the far end, the others the windows along the walls
+        const mid = j === 1 || j === 3, x = mid ? (rand(k, 70 + j, seed) - 0.5) * 0.12 : (rand(k, 70 + j, seed) - 0.5) * 1.6;
+        const tw = 0.5 + 0.5 * Math.sin(t * (1.4 + rand(k, 80 + j, seed) * 1.6) + k * 1.7 + j);
+        const a = (mid ? 0.6 * clamp((rel - 0.6) / 4, 0.25, 1) : 0.3) * tw * (1 - hz * 0.7);
+        if (a < 0.02) continue;
+        const half = (mid ? 0.06 + 0.08 * tw : 0.04 + 0.06 * tw) * (1 + rel * 0.05);
+        ctx.globalAlpha = a;
+        ctx.beginPath(); this.proj(x - half, 1, z); ctx.moveTo(this.px, this.py); this.proj(x + half, 1, z); ctx.lineTo(this.px, this.py); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Every few seconds a koi leaps across the river somewhere ahead, clear of the blocks standing in the water.
+    updateFish(dt) {
+      const L = this.o.seg, now = this.time;
+      for (const F of this.fish) {
+        F.s += dt / F.dur;
+        if (F.s >= 1 && !F.landed) { F.landed = true; this.splashes.push({ x: F.x0 + F.dx, z: F.z, t0: now, big: 1 }); }
+      }
+      this.fish = this.fish.filter(F => F.s < 1.05 && F.z - this.cz > 0.4);
+      this.splashes = this.splashes.filter(S => now - S.t0 < 900 && S.z - this.cz > 0.3);
+      if (now < this.nextFish || this.introT < INTRO.end || this.fish.length >= 2) return;
+      this.nextFish = now + 1800 + Math.random() * 2600;
+      for (let tries = 0; tries < 5; tries++) {
+        const z = this.cz + 0.95 + Math.random() * 1.3, dx = (Math.random() < 0.5 ? -1 : 1) * (0.32 + Math.random() * 0.2);
+        const x0 = clamp((Math.random() - 0.5) * 1.1, -0.65, 0.65) - dx / 2, H = 0.3 + Math.random() * 0.18;
+        // the whole arc has to stay clear of the blocks in the water
+        const A = [Math.min(x0, x0 + dx) - 0.08, Math.max(x0, x0 + dx) + 0.08, 1 - H - 0.08, 1, z - 0.08, z + 0.08];
+        let clear = true;
+        for (let k = Math.floor(z / L) - 1; k <= Math.floor(z / L) + 1 && clear; k++) {
+          const m = this.tiles(k, 2);
+          for (let i = 0; i < m; i++) { const b = this.boxAt(k, 2, i, m); if (b && hits(A, this.envOf(b, 0.02))) { clear = false; break; } }
+        }
+        if (!clear) continue;
+        this.fish.push({ x0, dx, z, H, s: 0, dur: 0.95 + Math.random() * 0.35, ph: Math.random() * TAU });
+        this.splashes.push({ x: x0, z, t0: now, big: 0.7 });
+        return;
+      }
+    }
+
+    fishAt(F, s) { return [F.x0 + F.dx * s, 1 - F.H * 4 * s * (1 - s), F.z]; }
+
+    // A blocky koi: cream body with red-orange patches, a fin of a tail flicking as it flies.
+    drawFish(F) {
+      const s = clamp(F.s, 0, 1), [x, y, z] = this.fishAt(F, s), rel = z - this.cz;
+      if (rel < this.o.near * 6) return;
+      const ctx = this.ctx, T = this.t, hz = this.hazeAt(rel);
+      this.proj(x, y, z); const sx = this.px, sy = this.py;
+      const [x2, y2] = this.fishAt(F, Math.min(1, s + 0.03)), [x1, y1] = this.fishAt(F, Math.max(0, s - 0.03));
+      this.proj(x2, y2, z); const ex = this.px, ey = this.py; this.proj(x1, y1, z);
+      const ang = Math.atan2(ey - this.py, ex - this.px), S = (this.f * 0.22) / rel;
+      // slips out of the water and back in rather than popping
+      const g = Math.min(1, s / 0.1, (1 - s) / 0.1);
+      if (g <= 0) return;
+      const tail = Math.sin(this.time / 70 + F.ph) * 0.35, col = c => css(mix(c, T.haze, hz * 0.5));
+      ctx.save();
+      ctx.translate(sx, sy); ctx.rotate(ang); ctx.scale(g, g);
+      ctx.save(); ctx.translate(-S * 0.42, 0); ctx.rotate(tail);
+      ctx.fillStyle = col(hex(THEME.koiFin));
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-S * 0.32, -S * 0.26); ctx.lineTo(-S * 0.32, S * 0.26); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      // body tapering in two steps toward the tail, head blunt
+      ctx.fillStyle = col(hex(THEME.koi));
+      ctx.fillRect(-S * 0.45, -S * 0.11, S * 0.2, S * 0.22); ctx.fillRect(-S * 0.27, -S * 0.17, S * 0.72, S * 0.34);
+      ctx.fillStyle = col(hex(THEME.koiRed));
+      ctx.fillRect(-S * 0.14, -S * 0.17, S * 0.3, S * 0.2); ctx.fillRect(S * 0.24, -S * 0.17, S * 0.14, S * 0.13);
+      ctx.fillStyle = col(hex(THEME.koiFin)); ctx.fillRect(S * 0.02, S * 0.12, S * 0.12, S * 0.1);
+      ctx.fillStyle = css(T.lo); ctx.fillRect(S * 0.32, -S * 0.06, Math.max(1, S * 0.06), Math.max(1, S * 0.06));
+      ctx.restore();
+    }
+
+    // Where a koi leaves or meets the water: a ring spreading on the surface and a few drops thrown up.
+    drawSplash(S) {
+      const a = (this.time - S.t0) / 900, rel = S.z - this.cz;
+      if (a < 0 || a >= 1 || rel < this.o.near * 6) return;
+      const ctx = this.ctx, r = (0.03 + 0.16 * a) * S.big;
+      this.proj(S.x, 1, S.z); const cx = this.px, cy = this.py;
+      this.proj(S.x + r, 1, S.z); const rx = Math.abs(this.px - cx);
+      this.proj(S.x, 1, S.z + r); const ry = Math.max(0.6, Math.abs(this.py - cy));
+      ctx.globalAlpha = (1 - a) * 0.6;
+      ctx.strokeStyle = '#E8D9C4'; ctx.lineWidth = clamp((this.f * 0.004) / rel, 0.6, 2);
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, TAU); ctx.stroke();
+      if (a < 0.6) {
+        const q = Math.max(1, (this.f * 0.009) / rel), h = 0.16 * S.big * (a / 0.6) * (1 - a / 0.6) * 4;
+        ctx.fillStyle = '#E8D9C4';
+        for (let i = 0; i < 6; i++) {
+          const ang = (i * TAU) / 6 + S.x * 7, d = 0.09 * S.big * (a / 0.6);
+          this.proj(S.x + Math.cos(ang) * d, 1 - h * (0.6 + 0.4 * ((i * 7) % 3) / 2), S.z + Math.sin(ang) * d * 0.5);
+          ctx.fillRect(this.px - q / 2, this.py - q / 2, q, q);
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // ---- Paper windows and their glow ----
+    q4(w, a) {
+      const Q = this.Q;
+      for (let i = 0; i < 4; i++) { this.pt(w, a[i * 3], a[i * 3 + 1], a[i * 3 + 2]); Q[i * 2] = this.px; Q[i * 2 + 1] = this.py; }
+    }
+    // A pane between the projected corners in this.Q: lit paper with a wooden lattice (and a glow), or dark glass.
+    paneQ(lit, hz, rel, cols, rows, glow = 1) {
+      const c = this.ctx, Q = this.Q, T = this.t, Lp = (a, b, t) => a + (b - a) * t;
+      c.beginPath(); c.moveTo(Q[0], Q[1]); c.lineTo(Q[2], Q[3]); c.lineTo(Q[4], Q[5]); c.lineTo(Q[6], Q[7]); c.closePath();
+      c.fillStyle = css(lit ? mix(T.paper, T.haze, hz * 0.6) : mix(T.pane, T.haze, hz));
+      c.fill();
+      if (rel < this.patFar) {
+        for (let i = 1; i < cols; i++) {
+          const s = i / cols;
+          c.moveTo(Lp(Q[0], Q[6], s), Lp(Q[1], Q[7], s)); c.lineTo(Lp(Q[2], Q[4], s), Lp(Q[3], Q[5], s));
+        }
+        for (let j = 1; j < rows; j++) {
+          const s = j / rows;
+          c.moveTo(Lp(Q[0], Q[2], s), Lp(Q[1], Q[3], s)); c.lineTo(Lp(Q[6], Q[4], s), Lp(Q[7], Q[5], s));
+        }
+        c.strokeStyle = css(mix(lit ? T.lattice : T.lo, T.haze, hz)); c.lineWidth = clamp((this.f * 0.004) / rel, 0.6, 2.2); c.stroke();
+      }
+      if (lit && rel < 10 && glow > 0) {
+        const diag = Math.max(Math.hypot(Q[4] - Q[0], Q[5] - Q[1]), Math.hypot(Q[6] - Q[2], Q[7] - Q[3]));
+        this.glowAt((Q[0] + Q[2] + Q[4] + Q[6]) / 4, (Q[1] + Q[3] + Q[5] + Q[7]) / 4,
+          Math.min(diag * 2.2, diag + Math.min(this.w, this.h) * 0.12), glow * 0.5 * (1 - hz) * clamp(1.5 - rel / 6, 0.12, 1));
+      }
+    }
+    // Windows on a block standing out of wall w (from depth d0 to d1): one on the face toward the middle of the
+    // corridor, and one on the end facing the camera when the block is deep enough to hold it.
+    windows(w, a0, a1, z0, z1, d0, d1, zA, lit, hz, rel) {
+      const h = a1 - a0, len = z1 - z0, dd = d1 - d0;
+      if (h < 0.05 || len < 0.04) return;
+      const wz0 = Math.max(z0 + len * 0.22, zA), wz1 = z1 - len * 0.22;
+      if (wz1 > wz0) {
+        this.q4(w, [a0 + h * 0.22, d1 + 0.002, wz0, a1 - h * 0.22, d1 + 0.002, wz0, a1 - h * 0.22, d1 + 0.002, wz1, a0 + h * 0.22, d1 + 0.002, wz1]);
+        this.paneQ(lit, hz, rel, 3, 2);
+      }
+      if (this.q === 0 && z0 >= zA && dd > 0.1 && rel < this.patFar) {
+        const z = z0 - 0.002;
+        this.q4(w, [a0 + h * 0.25, d0 + dd * 0.25, z, a1 - h * 0.25, d0 + dd * 0.25, z, a1 - h * 0.25, d0 + dd * 0.75, z, a0 + h * 0.25, d0 + dd * 0.75, z]);
+        this.paneQ(lit, hz, rel, 2, 2, 0.6);
+      }
+    }
+    glowAt(x, y, size, alpha) {
+      if (this.q >= 2 || !(size > 2) || alpha <= 0.01) return;
+      const c = this.bctx;
+      c.globalAlpha = Math.min(1, alpha);
+      c.drawImage(this.spr, (x - size / 2) / 4, (y - size / 2) / 4, size / 4, size / 4);
     }
 
     cube(c) {
@@ -369,9 +570,12 @@
         ctx.moveTo(SX[F[0]], SY[F[0]]); ctx.lineTo(SX[F[1]], SY[F[1]]);
         ctx.lineTo(SX[F[2]], SY[F[2]]); ctx.lineTo(SX[F[3]], SY[F[3]]);
         ctx.closePath();
-        ctx.fillStyle = css(this.shade(col, light * lf, hz));
+        // the solid cubes are paper lanterns: lit from inside, barely shaded
+        ctx.fillStyle = css(mix(mul(col, 0.72 + 0.28 * light), T.haze, hz * 0.6));
         ctx.fill();
       }
+      this.proj(c.x, c.y, c.z);
+      this.glowAt(this.px, this.py, (this.f * s * 9) / rel, 0.8 * (1 - hz));
     }
 
     /* ---- The jumper: a small cube creature hopping between wall boxes.
@@ -660,13 +864,15 @@
       const o = this.o, ctx = this.ctx, w = this.w, h = this.h, T = this.t;
       if (!w || !h) return;
       this.sane();
-      if (this.introT < 0) { ctx.globalAlpha = 1; ctx.fillStyle = '#05070A'; ctx.fillRect(0, 0, w, h); return; }
+      if (this.introT < 0) { ctx.globalAlpha = 1; ctx.fillStyle = '#120D11'; ctx.fillRect(0, 0, w, h); return; }
       const cz = this.cz = this.camZ + this.scrollZ + this.introZ();
       this.cr = Math.cos(o.roll); this.sr = Math.sin(o.roll);
       this.jHit = null;
       this.ox = w * o.vp[0] + this.vx * w; this.oy = h * o.vp[1] + this.vy * h;
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       ctx.fillStyle = css(T.haze); ctx.fillRect(0, 0, w, h);
+      const B = this.bctx; B.globalAlpha = 1; B.globalCompositeOperation = 'source-over';
+      B.clearRect(0, 0, this.bloomC.width, this.bloomC.height); B.globalCompositeOperation = 'lighter';
       const L = o.seg, zNear = cz + o.near;
       const k0 = Math.floor(zNear / L), k1 = Math.floor((cz + (this.drawFar || o.far)) / L);
       const buckets = this.buckets; buckets.clear();
@@ -675,6 +881,10 @@
         c.z = c.key = cz + o.near + 0.4 + ((((c.z0 - cz) % this.range) + this.range) % this.range);
         add(c.z, c);
       }
+      if (o.river) {
+        for (const F of this.fish) add(F.z, { key: F.z, fish: F });
+        for (const S of this.splashes) add(S.z, { key: S.z + 0.001, splash: S });
+      }
       const pose = o.jumper ? this.jumperPose() : null;
       if (pose) add(pose.z, { key: pose.z - (pose.air ? 0 : 0.002), pose });
       for (let k = k1; k >= k0; k--) {
@@ -682,6 +892,11 @@
         if (zB <= zNear) continue;
         if (zA < zNear) zA = zNear;
         this.segment(k, zA, zB, (zA + zB) / 2 - cz, buckets.get(k));
+      }
+      if (this.q < 2) {
+        ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.7;
+        ctx.drawImage(this.bloomC, 0, 0, w, h);
+        ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       }
       const it = this.introT;
       if (it < INTRO.reveal + 0.3) this.reveal(it);
@@ -702,9 +917,9 @@
       if (p >= 1 || !Number.isFinite(this.ox)) return;
       const R = 1 + p * Math.hypot(w, h) * 1.25;
       const g = ctx.createRadialGradient(this.ox, this.oy, 0, this.ox, this.oy, R);
-      g.addColorStop(0, 'rgba(5,7,10,' + (0.7 * (1 - p)).toFixed(3) + ')');
-      g.addColorStop(0.5, 'rgba(5,7,10,' + (0.85 * (1 - p)).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(5,7,10,1)');
+      g.addColorStop(0, 'rgba(18,13,17,' + (0.7 * (1 - p)).toFixed(3) + ')');
+      g.addColorStop(0.5, 'rgba(18,13,17,' + (0.85 * (1 - p)).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(18,13,17,1)');
       ctx.globalAlpha = 1 - smooth((p - 0.55) / 0.45);
       ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 1;

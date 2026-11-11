@@ -24,7 +24,7 @@
 .pj-stat {
   display: grid; gap: 6px; align-content: start; padding: 22px 22px 20px;
   background: var(--bg); border: 1.5px solid var(--line-strong);
-  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547, 5px 5px 0 #212F3E;
+  box-shadow: 1px 1px 0 #5C3A30, 2px 2px 0 #57372E, 3px 3px 0 #51342D, 4px 4px 0 #4A312C, 5px 5px 0 #422E2B;
 }
 .pj-stat strong { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1; letter-spacing: -.03em; }
 .pj-stat span { color: var(--muted); font-family: var(--label); font-size: .95rem; line-height: 1.4; }
@@ -42,7 +42,7 @@
   counter-increment: step; content: counter(step, decimal-leading-zero);
   display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 6px;
   background: var(--accent); color: var(--ink); font: 700 .95rem/1 var(--label);
-  box-shadow: 1px 1px 0 #D9531C, 2px 2px 0 #C24817, 3px 3px 0 #A93E13, 4px 4px 0 #8F3410;
+  box-shadow: 1px 1px 0 #CF8044, 2px 2px 0 #C47640, 3px 3px 0 #B86B3D, 4px 4px 0 #A9603A;
 }
 .pj-step h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.3rem; line-height: 1.2; }
 .pj-step p { margin: 0; color: var(--muted); }
@@ -57,10 +57,10 @@
 .pj-bars .acc { width: 58%; }
 .pj-bars .num { width: 1%; white-space: nowrap; text-align: right; font-family: var(--label); }
 .pj-bars tbody tr { transition: background-color .2s; }
-.pj-bars tbody tr:hover { background: rgba(233, 228, 216, .04); }
+.pj-bars tbody tr:hover { background: rgba(241, 230, 214, .04); }
 .pj-track { display: flex; align-items: center; gap: 12px; }
-.pj-bar { flex: none; height: 14px; width: calc(var(--v) * (100% - 64px)); background: #6C7F94; border-radius: 0 4px 4px 0; }
-.is-best .pj-bar { background: #F2602A; }
+.pj-bar { flex: none; height: 14px; width: calc(var(--v) * (100% - 64px)); background: #5C4A48; border-radius: 0 4px 4px 0; }
+.is-best .pj-bar { background: #D98A48; }
 .pj-val { font-family: var(--label); font-weight: 600; }
 .is-best th, .is-best .pj-val { color: var(--text); }
 

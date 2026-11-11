@@ -25,27 +25,27 @@
    little slower than the page, so it reads as a layer further back. */
 .section { position: relative; }
 .section > .wrap { position: relative; }
-.section { --veil: rgba(10, 13, 18, .75); }
-.section.alt { --veil: rgba(10, 13, 18, .75); }
-.section.contact { --veil: rgba(5, 7, 10, .75); }
+.section { --veil: rgba(28, 21, 25, .75); }
+.section.alt { --veil: rgba(28, 21, 25, .75); }
+.section.contact { --veil: rgba(0, 0, 0, .75); }
 .bg-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 /* Lighting, top layer first: each section fades up from black and back down to it, so sections meet in a dip
-   to black like cuts between shots; a warm key light (the corridor's colour) spills in from a top corner, on
-   alternate sides from one section to the next, with a cool fill low on the other side; and a veil in the
+   to black like cuts between shots; an amber key light (the corridor's colour) spills in from a top corner, on
+   alternate sides from one section to the next, with a blue fill low on the other side; and a veil in the
    section's own colour thins the cube field behind the text. */
 .bg-field { --key-x: 86%; }
 .section:nth-of-type(odd) .bg-field { --key-x: 14%; }
 .bg-field::after {
   content: ""; position: absolute; inset: 0;
   background:
-    linear-gradient(180deg, var(--void), rgba(5, 7, 10, 0) 170px, rgba(5, 7, 10, 0) calc(100% - 170px), var(--void)),
-    radial-gradient(ellipse 62% 640px at var(--key-x) 0, rgba(255, 122, 60, .085), rgba(255, 122, 60, 0) 72%),
-    radial-gradient(ellipse 50% 520px at calc(100% - var(--key-x)) 100%, rgba(127, 155, 181, .05), rgba(127, 155, 181, 0) 72%),
+    linear-gradient(180deg, var(--void), rgba(0, 0, 0, 0) 170px, rgba(0, 0, 0, 0) calc(100% - 170px), var(--void)),
+    radial-gradient(ellipse 62% 640px at var(--key-x) 0, rgba(217, 138, 72, .085), rgba(217, 138, 72, 0) 72%),
+    radial-gradient(ellipse 50% 520px at calc(100% - var(--key-x)) 100%, rgba(91, 134, 196, .08), rgba(91, 134, 196, 0) 72%),
     linear-gradient(90deg, transparent, var(--veil) 26%, var(--veil) 74%, transparent);
 }
 .bg-field-in {
   position: absolute; left: 0; right: 0; top: -260px; bottom: -260px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath fill='%23E9E4D8' fill-opacity='.03' d='M0 -30L26 -15L0 0L-26 -15ZM52 -30L78 -15L52 0L26 -15ZM26 15L52 30L26 45L0 30ZM0 60L26 75L0 90L-26 75ZM52 60L78 75L52 90L26 75Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.016' d='M-26 -15L0 0L0 30L-26 15ZM26 -15L52 0L52 30L26 15ZM0 30L26 45L26 75L0 60ZM-26 75L0 90L0 120L-26 105ZM26 75L52 90L52 120L26 105Z'/%3E%3Cpath fill='%23E9E4D8' fill-opacity='.006' d='M0 0L26 -15L26 15L0 30ZM52 0L78 -15L78 15L52 30ZM26 45L52 30L52 60L26 75ZM0 90L26 75L26 105L0 120ZM52 90L78 75L78 105L52 120Z'/%3E%3C/svg%3E") 0 0 / 52px 90px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cpath fill='%23F1E6D6' fill-opacity='.03' d='M0 -30L26 -15L0 0L-26 -15ZM52 -30L78 -15L52 0L26 -15ZM26 15L52 30L26 45L0 30ZM0 60L26 75L0 90L-26 75ZM52 60L78 75L52 90L26 75Z'/%3E%3Cpath fill='%23F1E6D6' fill-opacity='.016' d='M-26 -15L0 0L0 30L-26 15ZM26 -15L52 0L52 30L26 15ZM0 30L26 45L26 75L0 60ZM-26 75L0 90L0 120L-26 105ZM26 75L52 90L52 120L26 105Z'/%3E%3Cpath fill='%23F1E6D6' fill-opacity='.006' d='M0 0L26 -15L26 15L0 30ZM52 0L78 -15L78 15L52 30ZM26 45L52 30L52 60L26 75ZM0 90L26 75L26 105L0 120ZM52 90L78 75L78 105L52 120Z'/%3E%3C/svg%3E") 0 0 / 52px 90px;
 }
 .has-drift .bg-field-in { will-change: transform; }
 .bg-lit { position: absolute; width: 52px; height: 60px; color: var(--accent); opacity: .3; }
@@ -101,15 +101,15 @@
   background: var(--bg); color: var(--text); text-decoration: none;
   border: 1.5px solid var(--line-strong);
   font: 600 .92rem/1 var(--label);
-  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547;
+  box-shadow: 1px 1px 0 #5C3A30, 2px 2px 0 #57372E, 3px 3px 0 #51342D, 4px 4px 0 #4A312C;
   transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s cubic-bezier(.2, .8, .2, 1), border-color .25s;
 }
 .soc::before { content: ""; flex: none; width: 8px; height: 8px; background: var(--accent); }
 .soc:hover {
   transform: translate(-2px, -2px); border-color: var(--text);
-  box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053, 3px 3px 0 #293A4D, 4px 4px 0 #253547, 5px 5px 0 #212F3E, 6px 6px 0 #1D2A38;
+  box-shadow: 1px 1px 0 #5C3A30, 2px 2px 0 #57372E, 3px 3px 0 #51342D, 4px 4px 0 #4A312C, 5px 5px 0 #422E2B, 6px 6px 0 #3D2C2E;
 }
-.soc:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #31455A, 2px 2px 0 #2D4053; }
+.soc:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #5C3A30, 2px 2px 0 #57372E; }
 
 @media (max-width: 860px) {
   .sec-head { grid-template-columns: 1fr; }

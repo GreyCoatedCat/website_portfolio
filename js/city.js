@@ -9,14 +9,14 @@
      pyramid roofs, drawn back to front with an orthographic camera. The jumper from the
      hero lives here too and walks a loop over its stairs, courtyard and bridge. */
   const CITY_MAT = {
-    stone: ['#2E3F52', '#46586D'], deck: ['#2E3F52', '#506276'], trim: ['#C9C0AC', '#E2DACA'],
-    court: ['#3B4F64', '#55677C'], tower: ['#7A8E9E', '#A9B7C2'], planter: ['#25303D', '#5A2E18'],
-    trunk: ['#1A222C', '#1A222C'], leaf: ['#F2B544', '#F7CB6E'], leaf2: ['#FF6A2B', '#FF8A55'],
-    roof: ['#FF6A2B', '#FF6A2B'], lamp: ['#FFD08A', '#FFE4B5'], body: ['#7F9BB5', '#A3BBD0'],
-    leg: ['#0D121A', '#0D121A'], float1: ['#7A8E9E', '#A9B7C2'], float2: ['#C9C0AC', '#E2DACA'], float3: ['#5A6B80', '#7F93A3'],
+    stone: ['#302125', '#3D2C2E'], deck: ['#302125', '#52312F'], trim: ['#D9C4A8', '#F1E6D6'],
+    court: ['#3D2C2E', '#5C3A30'], tower: ['#2E4057', '#3B5573'], planter: ['#1F181E', '#302125'],
+    trunk: ['#1F181E', '#1F181E'], leaf: ['#4E5E31', '#6B7A44'], leaf2: ['#7F4639', '#945C48'],
+    roof: ['#C24E38', '#C24E38'], lamp: ['#F2C48A', '#FFE2B0'], body: ['#5B86C4', '#7AA0D4'],
+    leg: ['#1F181E', '#1F181E'], float1: ['#2E4057', '#3B5573'], float2: ['#D9C4A8', '#F1E6D6'], float3: ['#C24E38', '#D98A48'],
   };
   const CITY_UNLIT = { lamp: true };
-  const ROOM_RGB = { back: hex('#E0803F'), side: hex('#A9542A'), floor: hex('#6E3519') };
+  const ROOM_RGB = { back: hex('#D98A48'), side: hex('#B86B3D'), floor: hex('#7F4639') };
   // Face corners in the order bottom-left, bottom-right, top-right, top-left, as seen from outside.
   const CITY_FACES = {
     px: { n: [1, 0, 0], c: b => [[b[3], b[1], b[5]], [b[3], b[1], b[2]], [b[3], b[4], b[2]], [b[3], b[4], b[5]]] },
@@ -31,10 +31,10 @@
   // Light is fixed to the camera, so the city always reads the same way however it is turned.
   const CITY_LIGHT = (() => { const v = [-0.6, 0.85, 0.35], l = Math.hypot(v[0], v[1], v[2]); return v.map(x => x / l); })();
   const DECALS = {
-    slit: [[0.38, 0.2, 0.62, 0.8, '#F2B544']],
-    door: [[0.26, 0, 0.74, 0.78, '#0A0D12']],
-    win: [[0.3, 0.35, 0.7, 0.75, '#0A0D12']],
-    dots: [[0.42, 0.14, 0.58, 0.3, '#0A0D12'], [0.42, 0.42, 0.58, 0.58, '#0A0D12'], [0.42, 0.7, 0.58, 0.86, '#0A0D12']],
+    slit: [[0.38, 0.2, 0.62, 0.8, '#F2C48A']],
+    door: [[0.26, 0, 0.74, 0.78, '#1F181E']],
+    win: [[0.3, 0.35, 0.7, 0.75, '#1F181E']],
+    dots: [[0.42, 0.14, 0.58, 0.3, '#1F181E'], [0.42, 0.42, 0.58, 0.58, '#1F181E'], [0.42, 0.7, 0.58, 0.86, '#1F181E']],
   };
 
   class City {
@@ -60,7 +60,7 @@
       const put = (x, y, z, m) => solid.set(key(x, y, z), m);
       const box = (x0, y0, z0, x1, y1, z1, m) => boxes.push({ b: [x0, y0, z0, x1, y1, z1], m });
       const dec = (x, y, z, f, t) => decal.set(key(x, y, z) + f, t);
-      // foundation with a bone cornice, a raised courtyard, a planter, a bridge and two towers
+      // foundation with a cream cornice, a raised courtyard, a planter, a bridge and two towers
       for (let x = 0; x < 10; x++) for (let z = 0; z < 10; z++) for (let y = 0; y < 4; y++) {
         const edge = x === 0 || x === 9 || z === 0 || z === 9;
         put(x, y, z, y === 3 ? (edge ? 'trim' : 'deck') : 'stone');
@@ -189,7 +189,7 @@
       const items = [
         { shadow: true, x, y, z, cx: x, cy: y + 0.001, cz: z },
         { b: [x - hw, by, z - hw, x + hw, by + bh, z + hw], m: 'body', faces: ALL_FACES, cx: x, cy: by + bh / 2, cz: z,
-          eye: { f: face, t: [[0.2, eyeV[0], 0.38, eyeV[1], '#E9E4D8'], [0.62, eyeV[0], 0.8, eyeV[1], '#E9E4D8']] } },
+          eye: { f: face, t: [[0.2, eyeV[0], 0.38, eyeV[1], '#F1E6D6'], [0.62, eyeV[0], 0.8, eyeV[1], '#F1E6D6']] } },
       ];
       for (const side of [-1, 1]) {
         const sw = walking ? Math.sin(W.phase) * 0.06 * side : 0;
@@ -317,7 +317,7 @@
         if (L.o && !(this.rotN(L.o)[2] > 0.05)) continue;
         this.P(L.x, L.y, L.z);
         const r = this.S * (L.o ? 1.3 : 0.9), lg = ctx.createRadialGradient(this.px, this.py, 0, this.px, this.py, r);
-        lg.addColorStop(0, 'rgba(255,190,110,.5)'); lg.addColorStop(1, 'rgba(255,190,110,0)');
+        lg.addColorStop(0, 'rgba(242,170,100,.45)'); lg.addColorStop(1, 'rgba(242,170,100,0)');
         ctx.fillStyle = lg; ctx.fillRect(this.px - r, this.py - r, r * 2, r * 2);
       }
       ctx.globalCompositeOperation = 'source-over';

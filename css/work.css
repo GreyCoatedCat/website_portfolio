@@ -20,26 +20,26 @@
 }
 .layer:first-child { box-shadow: 0 0 0 1px var(--line-strong); }
 .cover.is-lifted { --lift: 30px; }
-/* A cover that opens a project page lights up on hover: its palette flips to ember (orange ground, dark lines,
+/* A cover that opens a project page lights up on hover: its palette flips to amber (amber ground, dark lines,
    pale accents), so the picture itself says it can be pressed. The colour tokens the covers draw with are
    registered as colours, so the switch fades instead of jumping. */
-@property --ink { syntax: '<color>'; inherits: true; initial-value: #0E1620; }
-@property --void { syntax: '<color>'; inherits: true; initial-value: #05070A; }
-@property --paper { syntax: '<color>'; inherits: true; initial-value: #E9E4D8; }
-@property --paper-hi { syntax: '<color>'; inherits: true; initial-value: #DDD6C5; }
-@property --mid { syntax: '<color>'; inherits: true; initial-value: #3E5468; }
-@property --soft { syntax: '<color>'; inherits: true; initial-value: #8FA3B0; }
-@property --acc-fill { syntax: '<color>'; inherits: true; initial-value: #FF6A2B; }
-@property --acc-d { syntax: '<color>'; inherits: true; initial-value: #FF6A2B; }
-@property --acc-l { syntax: '<color>'; inherits: true; initial-value: #E2501A; }
+@property --ink { syntax: '<color>'; inherits: true; initial-value: #1C1519; }
+@property --void { syntax: '<color>'; inherits: true; initial-value: #120D11; }
+@property --paper { syntax: '<color>'; inherits: true; initial-value: #F1E6D6; }
+@property --paper-hi { syntax: '<color>'; inherits: true; initial-value: #D9C4A8; }
+@property --mid { syntax: '<color>'; inherits: true; initial-value: #3B5573; }
+@property --soft { syntax: '<color>'; inherits: true; initial-value: #B98A5C; }
+@property --acc-fill { syntax: '<color>'; inherits: true; initial-value: #D98A48; }
+@property --acc-d { syntax: '<color>'; inherits: true; initial-value: #D98A48; }
+@property --acc-l { syntax: '<color>'; inherits: true; initial-value: #C24E38; }
 .cover.is-link {
   cursor: pointer;
   transition: --ink .45s ease, --void .45s ease, --paper .45s ease, --paper-hi .45s ease, --mid .45s ease,
     --soft .45s ease, --acc-fill .45s ease, --acc-d .45s ease, --acc-l .45s ease;
 }
 .cover.is-link:hover, .tile:has(.tile-link:focus-visible) .cover.is-link {
-  --ink: #FF6A2B; --void: #FF6A2B; --mid: #C24817; --soft: #FFC4A3;
-  --paper: #0E1620; --paper-hi: #2A1A12; --acc-l: #FFF1E6; --acc-fill: #0E1620; --acc-d: #0E1620;
+  --ink: #D98A48; --void: #D98A48; --mid: #3B5573; --soft: #F2C48A;
+  --paper: #1C1519; --paper-hi: #52312F; --acc-l: #FFF6EA; --acc-fill: #1C1519; --acc-d: #1C1519;
 }
 .cover.is-lifted .layer:not(:first-child) { filter: drop-shadow(0 12px 12px rgba(0, 0, 0, .55)); }
 .tile-body { display: grid; gap: 10px; }

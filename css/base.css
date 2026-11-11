@@ -2,24 +2,27 @@
 
 :root {
   /* Layout: fly into a lit corridor of squares, read square tiles in the dark, end at a small city inside a cube.
-     One dark palette: navy-black ground, bone text, ember light at the end of the corridor. */
-  --void: #05070A;
-  --bg: #0A0D12;
-  --bg-2: #10151C;
-  --text: #E9E4D8;
-  --muted: #949FAA;
-  --line: rgba(233, 228, 216, .16);
-  --line-strong: rgba(233, 228, 216, .4);
-  --accent: #FF6A2B;
+     One dark palette, taken from the cover's night street: plum-black ground, cream text, amber paper light,
+     lantern red, dark wood, slate and sky blue. */
+  --void: #120D11;
+  --bg: #1C1519;
+  --bg-2: #261D22;
+  --text: #F1E6D6;
+  --muted: #A8968A;
+  --line: rgba(241, 230, 214, .16);
+  --line-strong: rgba(241, 230, 214, .4);
+  --accent: #D98A48;
+  --sky: #5B86C4;
+  --slate: #2E4057;
   /* tokens the project covers draw with */
-  --paper: #E9E4D8;
-  --paper-hi: #DDD6C5;
-  --ink: #0E1620;
-  --mid: #3E5468;
-  --soft: #8FA3B0;
-  --acc-fill: #FF6A2B;
-  --acc-d: #FF6A2B;
-  --acc-l: #E2501A;
+  --paper: #F1E6D6;
+  --paper-hi: #D9C4A8;
+  --ink: #1C1519;
+  --mid: #3B5573;
+  --soft: #B98A5C;
+  --acc-fill: #D98A48;
+  --acc-d: #D98A48;
+  --acc-l: #C24E38;
   /* Control-style type: geometric caps for titles (Poppins, in the Avant Garde family of shapes),
      a road-sign face for labels (Overpass, from Highway Gothic), Archivo for reading. */
   --display: "Poppins", "Century Gothic", "Avant Garde", system-ui, sans-serif;

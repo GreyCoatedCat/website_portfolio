@@ -43,7 +43,7 @@ def curve(fn, start=0.004, n=120, clip=4.2):
 
 
 def proposed():
-    # loss vs. confidence in the true class: the published baselines, plus the proposed loss in orange
+    # loss vs. confidence in the true class: the published baselines, plus the proposed loss in the accent colour
     rings = "".join(
         f'<rect x="{4 + i * 6}" y="{4 + i * 6}" width="{92 - i * 12}" height="{92 - i * 12}"/>'
         for i in range(8)
@@ -81,8 +81,8 @@ def proposed():
 def teliti():
     xs = [7, 25, 43, 61, 79]
     flagged = (3, 2)
-    base = f'<rect width="100" height="100" {fill("soft")}/>'
-    base += f'<g {stroke("mid", .5)}>' + "".join(
+    base = f'<rect width="100" height="100" {fill("mid")}/>'
+    base += f'<g {stroke("soft", .5)}>' + "".join(
         f'<rect x="{x - 1.5}" y="{y - 1.5}" width="17" height="17"/>' for x in xs for y in xs
     ) + "</g>"
     cells, l1, l2 = "", "", ""
@@ -99,11 +99,11 @@ def teliti():
     mid = f'<g {fill("ink")}>{cells}</g><g {fill("paper")}>{l1}</g><g {fill("soft")}>{l2}</g>'
     fx, fy = xs[flagged[0]], xs[flagged[1]]
     top = (
+        # the flagged posting: an accent card with dark lines, ringed
         f'<rect x="{fx}" y="{fy}" width="14" height="14" {fill("acc-fill")}/>'
-        f'<rect x="{fx + 1.8}" y="{fy + 2.2}" width="10.4" height="9.6" {fill("ink")}/>'
-        f'<g {fill("paper")}><rect x="{fx + 3.5}" y="{fy + 4}" width="7" height="1.4"/>'
-        f'<rect x="{fx + 3.5}" y="{fy + 6.6}" width="4.6" height="1.4"/><rect x="{fx + 3.5}" y="{fy + 9.2}" width="5.8" height="1.4"/></g>'
-        f'<rect x="{fx - 5}" y="{fy - 5}" width="24" height="24" {stroke("acc-l", 1.3)}/>'
+        f'<g {fill("ink")}><rect x="{fx + 2.5}" y="{fy + 3}" width="9" height="1.5"/>'
+        f'<rect x="{fx + 2.5}" y="{fy + 6.4}" width="6" height="1.5"/><rect x="{fx + 2.5}" y="{fy + 9.8}" width="7.5" height="1.5"/></g>'
+        f'<rect x="{fx - 5}" y="{fy - 5}" width="24" height="24" {stroke("ink", 1.3)}/>'
     )
     return stack([base, mid, top])
 

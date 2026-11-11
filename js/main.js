@@ -13,7 +13,7 @@
   const scenes = [];
 
   const heroCanvas = hero.querySelector('.corridor');
-  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: false, jumper: true, intro: state.motion });
+  const heroC = new Corridor(heroCanvas, { seed: 3, vp: [0.5, 0.42], vignette: false, jumper: true, intro: state.motion, river: true });
   if (state.motion) document.documentElement.classList.add('intro-pre');
   scenes.push({ el: heroCanvas, c: heroC, visible: true });
 
